@@ -16,8 +16,9 @@ let aiClient: GoogleGenAI | null = null;
 
 function getAiClient(): GoogleGenAI {
   if (!aiClient) {
-    const apiKey = process.env.API_KEY_GOV || process.env.API_KEY_GEMINI || process.env.GEMINI_API_KEY || process.env.VITE_API_KEY_GOV;
-    if (!apiKey) {
+    const rawApiKey = process.env.API_KEY_GOV || process.env.API_KEY_GEMINI || process.env.GEMINI_API_KEY || process.env.VITE_API_KEY_GOV;
+    const apiKey = rawApiKey?.trim();
+    if (!apiKey || apiKey === "your_gemini_api_key_here" || apiKey === "your_gemini_api_key" || apiKey.includes("your") || apiKey.length < 15) {
       throw new Error("MISSING_API_KEY");
     }
     aiClient = new GoogleGenAI({
@@ -47,28 +48,48 @@ app.post("/api/chat", async (req, res) => {
       return;
     }
 
+    const lastUserMsg = messages[messages.length - 1]?.text || "";
+    const lower = lastUserMsg.toLowerCase();
+
+    // Helper to generate elegant local rule-based response
+    const generateLocalFallback = (isApiError: boolean = false) => {
+      let fallbackText = "";
+      const isLula = lower.includes("lula") || lower.includes("presidente da república") || lower.includes("executivo");
+      const isLira = lower.includes("lira") || lower.includes("câmara") || lower.includes("arthur");
+      const isBarroso = lower.includes("barroso") || lower.includes("stf") || lower.includes("judiciário") || lower.includes("luís");
+      const isViagem = lower.includes("viagem") || lower.includes("transporte") || lower.includes("passagem") || lower.includes("voo");
+      const isSeguranca = lower.includes("segurança") || lower.includes("blindado") || lower.includes("escolta");
+      const isRanking = lower.includes("quem gastou mais") || lower.includes("maior gasto") || lower.includes("ranking") || lower.includes("mais gastou");
+
+      if (isRanking) {
+        fallbackText = "Atualmente, no nosso painel de auditoria, a autoridade com o maior gasto acumulado é **Arthur Lira** (Presidente da Câmara dos Deputados), com um total consolidado de **R$ 1.142.450,22**.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel ou no AI Studio para ativar o assistente de IA Gemini).*";
+      } else if (isLula) {
+        fallbackText = "O Presidente **Luiz Inácio Lula da Silva** possui um gasto unificado acumulado de **R$ 984.120,00**. Seu maior gasto registrado foi com passagens e suporte internacional em viagens oficiais de Estado.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel ou no AI Studio para ativar o assistente de IA Gemini).*";
+      } else if (isLira) {
+        fallbackText = "O Deputado **Arthur Lira** acumula despesas de **R$ 1.142.450,22**. Seu principal lançamento é referente à locação de aeronaves privadas para apoio às comitivas parlamentares.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel ou no AI Studio para ativar o assistente de IA Gemini).*";
+      } else if (isBarroso) {
+        fallbackText = "O Ministro **Luís Roberto Barroso** (Presidente do STF) acumula despesas de **R$ 380.000,00** focadas principalmente em deslocamentos internacionais e diárias de equipe técnica de apoio.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel ou no AI Studio para ativar o assistente de IA Gemini).*";
+      } else if (isViagem) {
+        fallbackText = "A categoria de **TRANSPORTE E VIAGENS** é disparada a mais onerosa do painel, acumulando mais de **R$ 1.667.125,65** em fretamentos de jatos, passagens e combustível.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel ou no AI Studio para ativar o assistente de IA Gemini).*";
+      } else if (isSeguranca) {
+        fallbackText = "Despesas com **SEGURANÇA E LOGÍSTICA** somam mais de **R$ 220.000,00** no painel atual, englobando carros blindados de escolta, comunicação criptografada e suporte tático.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel ou no AI Studio para ativar o assistente de IA Gemini).*";
+      } else {
+        fallbackText = `Olá! Entendi seu interesse em despesas federais e transparência pública. Atualmente monitoramos 8 autoridades de alto escalão com gastos unificados.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Para habilitar respostas cognitivas completas do modelo Gemini 3.5 Flash, configure a variável de ambiente **API_KEY_GOV** ou **API_KEY_GEMINI** com sua chave de API no Vercel ou no AI Studio).*`;
+      }
+
+      if (isApiError) {
+        fallbackText = `⚠️ **Nota de Conexão:** A chave de API fornecida (${process.env.API_KEY_GOV ? 'API_KEY_GOV' : process.env.API_KEY_GEMINI ? 'API_KEY_GEMINI' : 'GEMINI_API_KEY'}) retornou um erro na API do Gemini. Exibindo resposta baseada no motor local:\n\n${fallbackText}`;
+      }
+      return fallbackText;
+    };
+
     // Lazy load the AI client
     let ai;
     try {
       ai = getAiClient();
     } catch (err: any) {
       if (err.message === "MISSING_API_KEY") {
-        // Fallback friendly mock response if no API key is set yet
-        const lastUserMsg = messages[messages.length - 1]?.text || "";
-        const lower = lastUserMsg.toLowerCase();
-        let fallbackText = "";
-        
-        if (lower.includes("quem gastou mais") || lower.includes("maior gasto") || lower.includes("ranking") || lower.includes("mais gastou")) {
-          fallbackText = "Atualmente, no nosso painel de auditoria, a autoridade com o maior gasto acumulado é **Arthur Lira** (Presidente da Câmara dos Deputados), com um total consolidado de **R$ 1.142.450,22**.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** no Vercel para ativar o assistente cognitivo Gemini).*";
-        } else if (lower.includes("lula") || lower.includes("presidente")) {
-          fallbackText = "O Presidente **Luiz Inácio Lula da Silva** possui um gasto unificado acumulado de **R$ 984.120,00**. Seu maior gasto registrado foi com passagens e suporte internacional em viagens oficiais de Estado.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** no Vercel para ativar o assistente cognitivo Gemini).*";
-        } else if (lower.includes("lira") || lower.includes("câmara")) {
-          fallbackText = "O Deputado **Arthur Lira** acumula despesas de **R$ 1.142.450,22**. Seu principal lançamento é referente à locação de aeronaves privadas para apoio às comitivas parlamentares.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** no Vercel para ativar o assistente cognitivo Gemini).*";
-        } else {
-          fallbackText = "Olá! Entendi sua pergunta sobre despesas federais e transparência pública. Atualmente monitoramos 8 autoridades de alto escalão do executivo, legislativo e judiciário.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Para habilitar respostas cognitivas completas do modelo Gemini 3.5 Flash, configure a variável de ambiente **API_KEY_GOV** com sua chave de API no Vercel ou no AI Studio).*";
-        }
-
-        res.json({ text: fallbackText });
+        res.json({ text: generateLocalFallback(false) });
         return;
       }
       throw err;
@@ -101,17 +122,22 @@ DIRETRIZES DE RESPOSTA CRÍTICAS:
       parts: [{ text: m.text }]
     }));
 
-    // Generate response using gemini-3.5-flash as recommended
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
-      contents: contents,
-      config: {
-        systemInstruction: systemInstruction,
-        temperature: 0.2,
-      }
-    });
+    try {
+      // Generate response using gemini-3.5-flash as recommended
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: contents,
+        config: {
+          systemInstruction: systemInstruction,
+          temperature: 0.2,
+        }
+      });
 
-    res.json({ text: response.text });
+      res.json({ text: response.text });
+    } catch (genError: any) {
+      console.error("Erro na geração do Gemini, aplicando fallback local:", genError);
+      res.json({ text: generateLocalFallback(true) });
+    }
   } catch (error: any) {
     console.error("Erro no processamento do chatbot:", error);
     res.status(500).json({ error: "Erro interno no servidor ao processar o chat." });
