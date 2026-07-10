@@ -205,59 +205,59 @@ export default function App() {
   }, [selectedAutoridadeId, selectedAutoridadeGastos, totalGastoPorAutoridade]);
 
   // Handle Chat Input Question (NLP response engine based on data)
-  const handleChatSubmit = (e: React.FormEvent) => {
+  const handleChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
 
     const userText = chatInput;
     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    setChatMessages(prev => [...prev, { sender: "user", text: userText, date: timeNow }]);
+    const newUserMessage = { sender: "user" as const, text: userText, date: timeNow };
+    const updatedMessages = [...chatMessages, newUserMessage];
+
+    setChatMessages(updatedMessages);
     setChatInput("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      const lower = userText.toLowerCase();
-      let response = "";
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: updatedMessages,
+          customGastos: customGastos,
+          autoridades: AUTORIDADES,
+        }),
+      });
 
-      // Smart routing logic for dynamic data answers
-      if (lower.includes("quem gastou mais") || lower.includes("maior gasto total") || lower.includes("ranking")) {
-        const sorted = [...AUTORIDADES].sort((a, b) => (totalGastoPorAutoridade[b.id] || 0) - (totalGastoPorAutoridade[a.id] || 0));
-        response = `Atualmente, no nosso painel de auditoria, a autoridade com o maior gasto acumulado é **${sorted[0].nome}** (${sorted[0].cargo}), registrando um total consolidado de **R$ ${ (totalGastoPorAutoridade[sorted[0].id] || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }**.`;
-      } 
-      else if (lower.includes("lula") || lower.includes("presidente da república")) {
-        const total = totalGastoPorAutoridade["lula-123"] || 0;
-        const topGasto = [...customGastos].filter(g => g.autoridade_id === "lula-123").sort((a,b) => b.valor - a.valor)[0];
-        response = `O Presidente **Luiz Inácio Lula da Silva** possui um gasto unificado acumulado de **R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}**. Seu maior gasto individual registrado foi de **R$ ${topGasto?.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}** com a descrição: *"${topGasto?.descricao_original}"* em ${new Date(topGasto?.data_gasto).toLocaleDateString("pt-BR")}.`;
-      } 
-      else if (lower.includes("lira") || lower.includes("arthur lira")) {
-        const total = totalGastoPorAutoridade["lira-456"] || 0;
-        const topGasto = [...customGastos].filter(g => g.autoridade_id === "lira-456").sort((a,b) => b.valor - a.valor)[0];
-        response = `O Deputado **Arthur Lira** (Pres. da Câmara) acumula despesas de **R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}**. O maior lançamento individual é referente a **R$ ${topGasto?.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}** para *"${topGasto?.descricao_original}"*, contratado junto ao fornecedor *"${topGasto?.fornecedor_nome}"*.`;
-      } 
-      else if (lower.includes("barroso") || lower.includes("stf") || lower.includes("judiciário")) {
-        const total = powerStats.judiciario;
-        response = `O Poder Judiciário (representado pelos ministros do STF em nosso painel) acumula **R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}** em despesas unificadas. O Ministro Luís Roberto Barroso lidera com **R$ ${(totalGastoPorAutoridade["barroso-789"] || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}** em custos de viagens internacionais, diárias e apoio técnico.`;
-      }
-      else if (lower.includes("viagem") || lower.includes("transporte") || lower.includes("passagem")) {
-        const totalViagem = customGastos.filter(g => g.categoria_unificada === "TRANSPORTE E VIAGENS").reduce((sum, g) => sum + g.valor, 0);
-        response = `A categoria de **TRANSPORTE E VIAGENS** (fretamentos, passagens executivas e combustível) é historicamente uma das mais onerosas. No painel atual, ela representa um gasto acumulado de **R$ ${totalViagem.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}** entre todas as autoridades acompanhadas.`;
-      }
-      else if (lower.includes("segurança") || lower.includes("blindado") || lower.includes("escolta")) {
-        const totalSeg = customGastos.filter(g => g.categoria_unificada === "SEGURANÇA E LOGÍSTICA").reduce((sum, g) => sum + g.valor, 0);
-        response = `As despesas agregadas sob **SEGURANÇA E LOGÍSTICA** somam **R$ ${totalSeg.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}**. Elas incluem locação de veículos blindados de escolta, rádio-criptografia e suporte tático institucional.`;
-      }
-      else {
-        response = `Entendi seu questionamento sobre transparência de gastos. Atualmente, monitoramos **8 autoridades do alto escalão nacional** com despesas unificadas que somam **R$ ${powerStats.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}**. Use os filtros e clique nas linhas da tabela para inspecionar os comprovantes fiscais completos de cada um!`;
+      if (!response.ok) {
+        throw new Error("Failed to contact chat API");
       }
 
-      setChatMessages(prev => [...prev, { 
-        sender: "bot", 
-        text: response, 
-        date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-      }]);
+      const data = await response.json();
+      setChatMessages(prev => [
+        ...prev,
+        {
+          sender: "bot" as const,
+          text: data.text,
+          date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setChatMessages(prev => [
+        ...prev,
+        {
+          sender: "bot" as const,
+          text: "Desculpe, ocorreu um erro ao processar sua solicitação no momento. Verifique a conexão com o servidor ou tente novamente.",
+          date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 900);
+    }
   };
 
   // Add simulated expenditure
