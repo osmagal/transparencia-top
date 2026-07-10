@@ -18,7 +18,8 @@ import {
   ChevronLeft, 
   User,
   CheckCircle,
-  FileSpreadsheet
+  FileSpreadsheet,
+  MessageSquare
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
@@ -201,6 +202,31 @@ export default function App() {
       setProxyFailedIds(prev => ({ ...prev, [id]: true }));
     } else {
       setImageErrors(prev => ({ ...prev, [id]: true }));
+    }
+  };
+
+  const handleScrollToChat = () => {
+    if (activeTab !== "dashboard") {
+      setActiveTab("dashboard");
+      setTimeout(() => {
+        const element = document.getElementById("transparencia-chat");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          const input = element.querySelector("input");
+          if (input) {
+            setTimeout(() => input.focus(), 600);
+          }
+        }
+      }, 150);
+    } else {
+      const element = document.getElementById("transparencia-chat");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        const input = element.querySelector("input");
+        if (input) {
+          setTimeout(() => input.focus(), 600);
+        }
+      }
     }
   };
 
@@ -960,7 +986,7 @@ export default function App() {
               </div>
 
               {/* Glass Interactive Citizen Assistant (NLP Chatbot) */}
-              <div class="glass-panel rounded-2xl flex flex-col h-[340px] overflow-hidden">
+              <div id="transparencia-chat" class="glass-panel rounded-2xl flex flex-col h-[340px] overflow-hidden scroll-mt-24">
                 <div class="p-4 border-b border-white/10 flex items-center justify-between bg-blue-500/5">
                   <div class="flex items-center gap-2">
                     <div class="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
@@ -2201,6 +2227,22 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Floating Action Button (FAB) to scroll to chatbot */}
+      <div class="fixed bottom-6 right-6 z-50 flex items-center gap-2">
+        <button
+          onClick={handleScrollToChat}
+          class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-full shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 border border-white/10 transition-all duration-300 group hover:scale-105 active:scale-95 cursor-pointer"
+          title="Perguntar ao Assistente IA"
+        >
+          <div class="relative flex items-center justify-center">
+            <span class="absolute inline-flex h-2 w-2 rounded-full bg-emerald-400 opacity-75 animate-ping -top-1 -right-1"></span>
+            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400 -top-1 -right-1"></span>
+            <MessageSquare class="w-4 h-4 text-white group-hover:rotate-12 transition-transform duration-300" />
+          </div>
+          <span class="text-xs font-bold tracking-wide uppercase pr-1 hidden sm:inline">Perguntar ao Assistente IA</span>
+        </button>
+      </div>
 
     </div>
   );
