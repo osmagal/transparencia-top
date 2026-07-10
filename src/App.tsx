@@ -1341,11 +1341,11 @@ export default function App() {
                 ) : (
                   <div class="divide-y divide-white/5 max-h-[500px] overflow-y-auto custom-scrollbar">
                     {servidoresList.map((item, idx) => {
-                      const idVal = item.id || (item.servidor && item.servidor.id) || idx;
-                      const sName = item.servidor?.nome || "Nome não disponível";
-                      const sCpf = item.servidor?.cpfFormatado || "CPF Ocultado";
-                      const sState = item.servidor?.estado || "N/A";
-                      const isSelected = selectedServidor?.id === idVal;
+                      const idVal = item.id || item.servidor?.idServidorPensionista || item.servidor?.id || idx;
+                      const sName = item.servidor?.pessoa?.nome || item.servidor?.nome || "Nome não disponível";
+                      const sCpf = item.servidor?.pessoa?.cpfFormatado || item.servidor?.cpfFormatado || "CPF Ocultado";
+                      const sState = item.servidor?.estado || item.servidor?.pessoa?.estado || "N/A";
+                      const isSelected = (selectedServidor?.id || selectedServidor?.servidor?.idServidorPensionista || selectedServidor?.servidor?.id) === idVal;
 
                       // Extract main role
                       const firstCargo = item.fichasCargoEfetivo?.[0];
@@ -1417,8 +1417,8 @@ export default function App() {
                     <div class="flex justify-between items-start gap-2">
                       <div>
                         <span class="text-[9px] font-bold text-blue-400 uppercase tracking-widest block mb-1">DADOS FUNCIONAIS DETALHADOS</span>
-                        <h3 class="text-base font-bold text-white">{selectedServidor.servidor?.nome}</h3>
-                        <p class="text-[11px] text-slate-400 mt-0.5 font-mono">ID Registro: {selectedServidor.id || selectedServidor.servidor?.id || "N/A"}</p>
+                        <h3 class="text-base font-bold text-white">{selectedServidor.servidor?.pessoa?.nome || selectedServidor.servidor?.nome || "Nome não disponível"}</h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5 font-mono">ID Registro: {selectedServidor.id || selectedServidor.servidor?.idServidorPensionista || selectedServidor.servidor?.id || "N/A"}</p>
                       </div>
                       <span class={`px-2 py-0.5 rounded-full text-[10px] font-bold ${selectedServidor.situacao === "Ativo" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20" : "bg-amber-500/15 text-amber-400 border border-amber-500/20"}`}>
                         {selectedServidor.situacao || "Ativo"}
@@ -1470,7 +1470,7 @@ export default function App() {
                           value={remuneracaoMesAno}
                           onChange={(e) => {
                             setRemuneracaoMesAno(e.target.value);
-                            const idVal = selectedServidor.id || selectedServidor.servidor?.id;
+                            const idVal = selectedServidor.id || selectedServidor.servidor?.idServidorPensionista || selectedServidor.servidor?.id;
                             if (idVal) handleFetchRemuneracao(idVal, e.target.value);
                           }}
                           class="bg-white/5 border border-white/10 rounded-xl px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
@@ -1583,7 +1583,7 @@ export default function App() {
                             onClick={() => {
                               // Forward to chatbot with deep detailed question
                               setActiveTab("dashboard");
-                              const prompt = `Analise a remuneração de ${selectedServidor.servidor?.nome} que recebe R$ ${remuneracaoData.remuneracaoLiquida.toLocaleString("pt-BR")} líquidos de um salário bruto de R$ ${remuneracaoData.remuneracaoBasicaBruta.toLocaleString("pt-BR")}. O que você acha desses descontos e desse nível salarial para o cargo de ${selectedServidor.fichasCargoEfetivo?.[0]?.cargo}?`;
+                              const prompt = `Analise a remuneração de ${selectedServidor.servidor?.pessoa?.nome || selectedServidor.servidor?.nome || "Nome não disponível"} que recebe R$ ${remuneracaoData.remuneracaoLiquida.toLocaleString("pt-BR")} líquidos de um salário bruto de R$ ${remuneracaoData.remuneracaoBasicaBruta.toLocaleString("pt-BR")}. O que você acha desses descontos e desse nível salarial para o cargo de ${selectedServidor.fichasCargoEfetivo?.[0]?.cargo}?`;
                               setChatInput(prompt);
                               // We can simulate sending automatically!
                               setTimeout(() => {

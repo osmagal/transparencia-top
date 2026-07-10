@@ -8,7 +8,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Presidência da República",
     estado: "Federal",
-    foto_url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200&h=200", // Placeholder elegant profile
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/9/9e/Foto_oficial_de_Luiz_In%C3%A1cio_Lula_da_Silva_%28ombros%29_denoise.jpg",
     ativo: true
   },
   {
@@ -18,7 +18,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.LEGISLATIVO,
     orgao_instituicao: "Câmara dos Deputados",
     estado: "AL",
-    foto_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200",
+    foto_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVyuOqu2ygyCHx03TiAOUvhRZEmwuq5xUScC0ZrQeP3Q&s=10",
     ativo: true
   },
   {
@@ -28,7 +28,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.JUDICIARIO,
     orgao_instituicao: "Supremo Tribunal Federal",
     estado: "Federal",
-    foto_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200&h=200",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Luis_Roberto_Barroso_2014.jpg",
     ativo: true
   },
   {
@@ -38,7 +38,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.LEGISLATIVO,
     orgao_instituicao: "Senado Federal",
     estado: "MG",
-    foto_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200&h=200",
+    foto_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuIVPcp6J22CqtJRO27uWfdKTGur2HzqfjLDhCDAGdiw&s=10",
     ativo: true
   },
   {
@@ -48,7 +48,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo do RS",
     estado: "RS",
-    foto_url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=200&h=200",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/09.02.2026_%E2%80%93_Eduardo_Leite_in_February_2026_-_55087496770_%283x4%29.jpg/960px-09.02.2026_%E2%80%93_Eduardo_Leite_in_February_2026_-_55087496770_%283x4%29.jpg",
     ativo: true
   },
   {
@@ -58,7 +58,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo de SP",
     estado: "SP",
-    foto_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200&h=200",
+    foto_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSx6JtKf6mYFDoOiKdW8CIlwbTaUI9OWpod371Bt5rzPg&s",
     ativo: true
   },
   {
@@ -68,7 +68,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Ministério da Fazenda",
     estado: "Federal",
-    foto_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200&h=200",
+    foto_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNVwaYOctu_sSj1Xoe9I4xqpcschtHhCa_hHFaOAs51w&s=10",
     ativo: true
   },
   {
@@ -78,7 +78,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.JUDICIARIO,
     orgao_instituicao: "Supremo Tribunal Federal",
     estado: "Federal",
-    foto_url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200&h=200",
+    foto_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvAoxavL-Q0C2e6wMPOdXiE5i5T_rL7Dj4sLApkc9Usg&s=10",
     ativo: true
   }
 ];
