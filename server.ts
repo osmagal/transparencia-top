@@ -55,7 +55,11 @@ app.get("/api/proxy-image", async (req, res) => {
       host.endsWith("wikipedia.org") || 
       host.endsWith("googleusercontent.com") ||
       host.endsWith("gstatic.com") ||
-      host.endsWith("google.com");
+      host.endsWith("google.com") ||
+      host.endsWith("cnnbrasil.com.br") ||
+      host.endsWith("glbimg.com") ||
+      host.endsWith("ebc.com.br") ||
+      host.endsWith("globo.com");
 
     if (!isAllowed) {
       res.status(400).send("Domínio de imagem não permitido.");
@@ -76,6 +80,11 @@ app.get("/api/proxy-image", async (req, res) => {
     }
 
     const contentType = response.headers.get("content-type") || "image/jpeg";
+    if (!contentType.startsWith("image/")) {
+      res.status(400).send("Apenas arquivos de imagem são permitidos.");
+      return;
+    }
+
     res.setHeader("Content-Type", contentType);
     res.setHeader("Cache-Control", "public, max-age=86400"); // Cache for 1 day
 
@@ -124,7 +133,7 @@ app.post("/api/chat", async (req, res) => {
       } else if (isSeguranca) {
         fallbackText = "Despesas com **SEGURANÇA E LOGÍSTICA** somam mais de **R$ 220.000,00** no painel atual, englobando carros blindados de escolta, comunicação criptografada e suporte tático.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **GEMINI_API_KEY** ou **API_KEY_GEMINI** no AI Studio para ativar o assistente de IA Gemini).*";
       } else {
-        fallbackText = `Olá! Entendi seu interesse em despesas federais e transparência pública. Atualmente monitoramos 8 autoridades de alto escalão com gastos unificados.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Para habilitar respostas cognitivas completas do modelo Gemini 3.5 Flash, configure a variável de ambiente **GEMINI_API_KEY** ou **API_KEY_GEMINI** com sua chave de API no AI Studio).*`;
+        fallbackText = `Olá! Entendi seu interesse em despesas federais e transparência pública. Atualmente monitoramos 8 autoridades de alto escalão com gastos unificados.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Para habilitar respostas cognitivas completas do modelo Gemini 3.0 Flash, configure a variável de ambiente **GEMINI_API_KEY** ou **API_KEY_GEMINI** com sua chave de API no AI Studio).*`;
       }
 
       if (isApiError) {
@@ -173,9 +182,9 @@ DIRETRIZES DE RESPOSTA CRÍTICAS:
     }));
 
     try {
-      // Generate response using gemini-3.5-flash as recommended
+      // Generate response using gemini-3.0-flash as requested by user
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-3.0-flash',
         contents: contents,
         config: {
           systemInstruction: systemInstruction,

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Rounded dark background shield/container -->
+  <rect width="32" height="32" rx="8" fill="#0b1329"/>
+  <!-- Glowing border effects -->
+  <rect x="1" y="1" width="30" height="30" rx="7" stroke="#3b82f6" stroke-opacity="0.3" stroke-width="1.5"/>
+  <!-- Magnifying glass / Radar visual -->
+  <circle cx="15" cy="15" r="7" stroke="#3b82f6" stroke-width="2"/>
+  <circle cx="15" cy="15" r="3" fill="#10b981"/>
+  <!-- Diagonal handle of magnifying glass -->
+  <path d="M20 20L26 26" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Tiny sparkles or light nodes -->
+  <circle cx="25" cy="10" r="1.5" fill="#f59e0b"/>
+</svg>

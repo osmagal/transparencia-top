@@ -109,7 +109,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo do AM",
     estado: "AM",
-    foto_url: "https://upload.wikimedia.org/wikipedia/commons/d/df/Wilson_Lima_-_2023.jpg",
+    foto_url: "https://s2-oglobo.glbimg.com/zdlOclqqlc1hMzd4Uf0OjuViE3s=/0x0:660x493/924x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2023/2/D/B6Kf8dQbaUgTxeDFSxNg/2023-07-15-08-33-07-entrevista-nao-podemos-prescindir-do-governo-federal-diz-wilson-lima-govern.png",
     ativo: true
   },
   {
@@ -119,7 +119,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo do PA",
     estado: "PA",
-    foto_url: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Helder_Barbalho_%28foto_oficial_2023%29.jpg",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/5/50/Helder_Barbalho%2C_January_2023_%28cropped%29.jpg",
     ativo: true
   },
   {
@@ -170,7 +170,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo da BA",
     estado: "BA",
-    foto_url: "https://upload.wikimedia.org/wikipedia/commons/2/23/Jer%C3%B4nimo_Rodrigues_%28foto_oficial%29.jpg",
+    foto_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3ThwEa0F9rgKMVqP1g1Ws_urb1GzJoIByvzK7pnTFkA&s=10",
     ativo: true
   },
   {
@@ -180,7 +180,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo do CE",
     estado: "CE",
-    foto_url: "https://upload.wikimedia.org/wikipedia/commons/d/da/Elmano_de_Freitas_%28cropped%29.jpg",
+    foto_url: "https://imagens.ebc.com.br/OvDubuVcbZg0YEM1pxKEEuPXjzE=/770x0/https://agenciabrasil.ebc.com.br/sites/default/files/thumbnails/image/vac_abr0911235050.jpg?itok=mllvS88X",
     ativo: true
   },
   {
@@ -210,7 +210,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo de PE",
     estado: "PE",
-    foto_url: "https://upload.wikimedia.org/wikipedia/commons/2/23/Raquel_Lyra_%28cropped%29.jpg",
+    foto_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfmbAnYG8lUNCItfjZIjWMKBOUL-wefQP7G2-DmEyPfAHIlrprK5oOBf8&s=10",
     ativo: true
   },
   {
@@ -251,7 +251,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo do DF",
     estado: "DF",
-    foto_url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Ibaneis_Rocha_%28foto_oficial%29.jpg",
+    foto_url: "https://admin.cnnbrasil.com.br/wp-content/uploads/sites/12/2023/08/forum-governadores_mcamgo_abr_24052023-11-e1693844558355.jpg?w=419&h=283&crop=0",
     ativo: true
   },
   {
@@ -271,7 +271,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo do MT",
     estado: "MT",
-    foto_url: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Mauro_Mendes_em_2019.jpg",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/0/0f/2019_Reuni%C3%A3o_com_Ministros_da_Casa_Civil%2C_Defesa%2C_Rela%C3%A7%C3%B5es_Exteriores%2C_Meio_Ambiente%2C_Secretaria-Geral%2C_Secretaria_de_Governo%2C_GSI_e_Governadores_da_Amaz%C3%B4nia_Legal_-_48630502003_%28cropped%29_Mauro_Mendes.jpg",
     ativo: true
   },
   {
@@ -302,7 +302,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo de MG",
     estado: "MG",
-    foto_url: "https://upload.wikimedia.org/wikipedia/commons/3/36/Romeu_Zema_%28foto_oficial%29.jpg",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Romeu_Zema%2C_December_2024_%28cropped%29.jpg",
     ativo: true
   },
   {
@@ -312,7 +312,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo do RJ",
     estado: "RJ",
-    foto_url: "https://upload.wikimedia.org/wikipedia/commons/e/ea/Cl%C3%A1udio_Castro_%28cropped%29.jpg",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/c/c0/Claudio_Castro_como_Vice_Governador_do_Rio_de_Janeiro.jpg",
     ativo: true
   },
   // Região Sul
@@ -323,7 +323,7 @@ export const AUTORIDADES: Autoridade[] = [
     poder: Poder.EXECUTIVO,
     orgao_instituicao: "Governo do PR",
     estado: "PR",
-    foto_url: "https://upload.wikimedia.org/wikipedia/commons/7/75/Ratinho_Junior_%28foto_oficial%29.jpg",
+    foto_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5f4Er1vSsnWcIQRegKVHaPU4yUZpy27T-42I5X5pyyBwOiT1VZ9JE2P96&s=10",
     ativo: true
   },
   {

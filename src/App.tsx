@@ -165,14 +165,43 @@ export default function App() {
   const [selectedAutoridadeId, setSelectedAutoridadeId] = useState<string | null>(null);
 
   // Image loading errors tracker and proxy URL helper
+  const [proxyFailedIds, setProxyFailedIds] = useState<Record<string, boolean>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
-  const getProxyUrl = (url: string) => {
+  const getProxyUrl = (id: string, url: string) => {
     if (!url) return "";
-    if (url.startsWith("https://upload.wikimedia.org/") || url.startsWith("https://encrypted-tbn0.gstatic.com/")) {
-      return `/api/proxy-image?url=${encodeURIComponent(url)}`;
+    if (proxyFailedIds[id]) {
+      return url;
+    }
+    try {
+      const urlObj = new URL(url);
+      const host = urlObj.hostname.toLowerCase();
+      const isAllowed = 
+        host.endsWith("wikimedia.org") || 
+        host.endsWith("wikipedia.org") || 
+        host.endsWith("googleusercontent.com") ||
+        host.endsWith("gstatic.com") ||
+        host.endsWith("google.com") ||
+        host.endsWith("cnnbrasil.com.br") ||
+        host.endsWith("glbimg.com") ||
+        host.endsWith("ebc.com.br") ||
+        host.endsWith("globo.com");
+      if (isAllowed) {
+        return `/api/proxy-image?url=${encodeURIComponent(url)}`;
+      }
+    } catch (e) {
+      // Ignore URL parsing errors and return the original URL
     }
     return url;
+  };
+
+  const handleImageError = (id: string, url: string) => {
+    const currentSrc = getProxyUrl(id, url);
+    if (currentSrc.includes("/api/proxy-image") && !proxyFailedIds[id]) {
+      setProxyFailedIds(prev => ({ ...prev, [id]: true }));
+    } else {
+      setImageErrors(prev => ({ ...prev, [id]: true }));
+    }
   };
 
   // Civic simulation states
@@ -825,11 +854,11 @@ export default function App() {
                                   <div class="w-8 h-8 rounded-full bg-slate-800 border border-white/10 overflow-hidden flex items-center justify-center">
                                     {aut.foto_url && !imageErrors[aut.id] ? (
                                       <img 
-                                        src={getProxyUrl(aut.foto_url)} 
+                                        src={getProxyUrl(aut.id, aut.foto_url)} 
                                         alt={aut.nome} 
                                         class="w-full h-full object-cover" 
                                         referrerPolicy="no-referrer" 
-                                        onError={() => setImageErrors(prev => ({ ...prev, [aut.id]: true }))}
+                                        onError={() => handleImageError(aut.id, aut.foto_url)}
                                       />
                                     ) : (
                                       <User class="w-4 h-4 text-slate-400" />
@@ -1033,11 +1062,11 @@ export default function App() {
                       <div class="w-12 h-12 rounded-xl bg-slate-800 border border-white/10 overflow-hidden flex items-center justify-center">
                         {aut.foto_url && !imageErrors[aut.id] ? (
                           <img 
-                            src={getProxyUrl(aut.foto_url)} 
+                            src={getProxyUrl(aut.id, aut.foto_url)} 
                             alt={aut.nome} 
                             class="w-full h-full object-cover" 
                             referrerPolicy="no-referrer" 
-                            onError={() => setImageErrors(prev => ({ ...prev, [aut.id]: true }))}
+                            onError={() => handleImageError(aut.id, aut.foto_url)}
                           />
                         ) : (
                           <User class="w-6 h-6 text-slate-400" />
@@ -1093,11 +1122,11 @@ export default function App() {
                     <div class="w-14 h-14 rounded-full bg-slate-800 overflow-hidden mb-3 border-2 border-slate-400 flex items-center justify-center">
                       {filteredAutoridades[1].foto_url && !imageErrors[filteredAutoridades[1].id] ? (
                         <img 
-                          src={getProxyUrl(filteredAutoridades[1].foto_url)} 
+                          src={getProxyUrl(filteredAutoridades[1].id, filteredAutoridades[1].foto_url)} 
                           alt={filteredAutoridades[1].nome} 
                           class="w-full h-full object-cover" 
                           referrerPolicy="no-referrer"
-                          onError={() => setImageErrors(prev => ({ ...prev, [filteredAutoridades[1].id]: true }))}
+                          onError={() => handleImageError(filteredAutoridades[1].id, filteredAutoridades[1].foto_url)}
                         />
                       ) : (
                         <User class="w-6 h-6 text-slate-400" />
@@ -1118,11 +1147,11 @@ export default function App() {
                     <div class="w-16 h-16 rounded-full bg-slate-800 overflow-hidden mb-3 border-2 border-blue-500 flex items-center justify-center">
                       {filteredAutoridades[0].foto_url && !imageErrors[filteredAutoridades[0].id] ? (
                         <img 
-                          src={getProxyUrl(filteredAutoridades[0].foto_url)} 
+                          src={getProxyUrl(filteredAutoridades[0].id, filteredAutoridades[0].foto_url)} 
                           alt={filteredAutoridades[0].nome} 
                           class="w-full h-full object-cover" 
                           referrerPolicy="no-referrer"
-                          onError={() => setImageErrors(prev => ({ ...prev, [filteredAutoridades[0].id]: true }))}
+                          onError={() => handleImageError(filteredAutoridades[0].id, filteredAutoridades[0].foto_url)}
                         />
                       ) : (
                         <User class="w-8 h-8 text-slate-400" />
@@ -1143,11 +1172,11 @@ export default function App() {
                     <div class="w-14 h-14 rounded-full bg-slate-800 overflow-hidden mb-3 border-2 border-amber-700 flex items-center justify-center">
                       {filteredAutoridades[2].foto_url && !imageErrors[filteredAutoridades[2].id] ? (
                         <img 
-                          src={getProxyUrl(filteredAutoridades[2].foto_url)} 
+                          src={getProxyUrl(filteredAutoridades[2].id, filteredAutoridades[2].foto_url)} 
                           alt={filteredAutoridades[2].nome} 
                           class="w-full h-full object-cover" 
                           referrerPolicy="no-referrer"
-                          onError={() => setImageErrors(prev => ({ ...prev, [filteredAutoridades[2].id]: true }))}
+                          onError={() => handleImageError(filteredAutoridades[2].id, filteredAutoridades[2].foto_url)}
                         />
                       ) : (
                         <User class="w-6 h-6 text-slate-400" />
@@ -1804,11 +1833,11 @@ export default function App() {
                   <div class="w-14 h-14 rounded-full border border-white/20 overflow-hidden bg-slate-800 flex items-center justify-center">
                     {selectedAutoridade.foto_url && !imageErrors[selectedAutoridade.id] ? (
                       <img 
-                        src={getProxyUrl(selectedAutoridade.foto_url)} 
+                        src={getProxyUrl(selectedAutoridade.id, selectedAutoridade.foto_url)} 
                         alt={selectedAutoridade.nome} 
                         class="w-full h-full object-cover" 
                         referrerPolicy="no-referrer"
-                        onError={() => setImageErrors(prev => ({ ...prev, [selectedAutoridade.id]: true }))}
+                        onError={() => handleImageError(selectedAutoridade.id, selectedAutoridade.foto_url)}
                       />
                     ) : (
                       <User class="w-6 h-6 text-slate-400" />

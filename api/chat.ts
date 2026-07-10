@@ -68,7 +68,7 @@ export default async function handler(req: any, res: any) {
       } else if (isSeguranca) {
         fallbackText = "Despesas com **SEGURANÇA E LOGÍSTICA** somam mais de **R$ 220.000,00** no painel atual, englobando carros blindados de escolta, comunicação criptografada e suporte tático.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **GEMINI_API_KEY** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
       } else {
-        fallbackText = `Olá! Entendi seu interesse em despesas federais e transparência pública. Atualmente monitoramos 8 autoridades de alto escalão com gastos unificados.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Para habilitar respostas cognitivas completas do modelo Gemini 3.5 Flash, configure a variável de ambiente **GEMINI_API_KEY** ou **API_KEY_GEMINI** com sua chave de API no Vercel).*`;
+        fallbackText = `Olá! Entendi seu interesse em despesas federais e transparência pública. Atualmente monitoramos 8 autoridades de alto escalão com gastos unificados.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Para habilitar respostas cognitivas completas do modelo Gemini 3.0 Flash, configure a variável de ambiente **GEMINI_API_KEY** ou **API_KEY_GEMINI** com sua chave de API no Vercel).*`;
       }
 
       if (isApiError) {
@@ -117,7 +117,7 @@ DIRETRIZES DE RESPOSTA CRÍTICAS:
 
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-3.0-flash',
         contents: contents,
         config: {
           systemInstruction: systemInstruction,
