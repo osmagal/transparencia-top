@@ -1,0 +1,6 @@
+{
+  "name": "Transparência-Top",
+  "description": "Painel de transparência das remunerações e gastos das altas autoridades do Brasil com design Frosted Glass.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
