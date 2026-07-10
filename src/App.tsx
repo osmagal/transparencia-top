@@ -199,19 +199,60 @@ export default function App() {
     cnpj: ""
   });
 
+  // Period filter states (Initially covers the whole range of GASTOS from "2026-03" to "2026-06")
+  const [startPeriod, setStartPeriod] = useState<string>("2026-03");
+  const [endPeriod, setEndPeriod] = useState<string>("2026-06");
+
+  // Helper function to format "YYYY-MM" period strings to Portuguese format
+  const formatPeriod = (yyyymm: string) => {
+    if (!yyyymm) return "";
+    const [year, month] = yyyymm.split("-");
+    const monthNames = [
+      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+    const monthIdx = parseInt(month, 10) - 1;
+    return `${monthNames[monthIdx]} de ${year}`;
+  };
+
+  // Get all unique year-months present in the customGastos list, sorted
+  const availablePeriods = useMemo(() => {
+    const periods = new Set<string>();
+    customGastos.forEach(g => {
+      if (g.data_gasto) {
+        periods.add(g.data_gasto.substring(0, 7));
+      }
+    });
+    if (periods.size === 0) {
+      return ["2026-03", "2026-04", "2026-05", "2026-06"];
+    }
+    return Array.from(periods).sort();
+  }, [customGastos]);
+
+  // Filter expenditures based on selected period range
+  const filteredGastosByPeriod = useMemo(() => {
+    return customGastos.filter(g => {
+      if (!g.data_gasto) return true;
+      const yyyymm = g.data_gasto.substring(0, 7);
+      const isAfterStart = !startPeriod || yyyymm >= startPeriod;
+      const isBeforeEnd = !endPeriod || yyyymm <= endPeriod;
+      return isAfterStart && isBeforeEnd;
+    });
+  }, [customGastos, startPeriod, endPeriod]);
+
   // Calculate sum of expenditures by authority
   const totalGastoPorAutoridade = useMemo(() => {
     const map: Record<string, number> = {};
     AUTORIDADES.forEach(aut => {
       map[aut.id] = 0;
     });
-    customGastos.forEach(g => {
+    filteredGastosByPeriod.forEach(g => {
       if (map[g.autoridade_id] !== undefined) {
         map[g.autoridade_id] += g.valor;
       }
     });
     return map;
-  }, [customGastos]);
+  }, [filteredGastosByPeriod]);
 
   // Aggregate stats per power type
   const powerStats = useMemo(() => {
@@ -219,7 +260,7 @@ export default function App() {
     let legislativo = 0;
     let judiciario = 0;
 
-    customGastos.forEach(g => {
+    filteredGastosByPeriod.forEach(g => {
       const aut = AUTORIDADES.find(a => a.id === g.autoridade_id);
       if (aut) {
         if (aut.poder === Poder.EXECUTIVO) executivo += g.valor;
@@ -230,7 +271,7 @@ export default function App() {
 
     const total = executivo + legislativo + judiciario;
     return { executivo, legislativo, judiciario, total };
-  }, [customGastos]);
+  }, [filteredGastosByPeriod]);
 
   // Unique states lists
   const availableStates = useMemo(() => {
@@ -267,7 +308,7 @@ export default function App() {
       "OUTROS GASTOS CORPORATIVOS": 0
     };
 
-    customGastos.forEach(g => {
+    filteredGastosByPeriod.forEach(g => {
       if (map[g.categoria_unificada] !== undefined) {
         map[g.categoria_unificada] += g.valor;
       }
@@ -278,7 +319,7 @@ export default function App() {
       value,
       color: CATEGORY_COLORS[name as CategoriaUnificada]
     })).filter(item => item.value > 0);
-  }, [customGastos]);
+  }, [filteredGastosByPeriod]);
 
   // Selected authority details
   const selectedAutoridade = useMemo(() => {
@@ -288,10 +329,10 @@ export default function App() {
   // Gastos of selected authority
   const selectedAutoridadeGastos = useMemo(() => {
     if (!selectedAutoridadeId) return [];
-    return customGastos
+    return filteredGastosByPeriod
       .filter(g => g.autoridade_id === selectedAutoridadeId)
       .sort((a, b) => new Date(b.data_gasto).getTime() - new Date(a.data_gasto).getTime());
-  }, [selectedAutoridadeId, customGastos]);
+  }, [selectedAutoridadeId, filteredGastosByPeriod]);
 
   // Category data specific to selected authority
   const selectedAutoridadeCategoryData = useMemo(() => {
@@ -595,6 +636,67 @@ export default function App() {
             </div>
           </div>
         </div>
+
+        {/* Global Period Filter Bar for expense analysis tabs */}
+        {(activeTab === "dashboard" || activeTab === "autoridades" || activeTab === "ranking") && (
+          <div id="period-filter-bar" class="glass-panel p-4 rounded-2xl flex flex-col md:flex-row items-center gap-4 justify-between bg-white/[0.02] border border-white/10 shadow-lg shadow-black/20">
+            <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
+              <div class="flex items-center gap-2 text-xs font-semibold text-slate-300">
+                <Filter class="w-4 h-4 text-blue-400" />
+                <span>Filtrar Período da Análise:</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="flex flex-col">
+                  <span class="text-[9px] uppercase tracking-wider text-slate-400 font-bold mb-1">Mês Inicial</span>
+                  <select 
+                    id="select-start-period"
+                    value={startPeriod} 
+                    onChange={(e) => {
+                      setStartPeriod(e.target.value);
+                      if (endPeriod && e.target.value > endPeriod) {
+                        setEndPeriod(e.target.value);
+                      }
+                    }}
+                    class="bg-[#0b0e14] border border-white/10 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500 min-w-[130px] hover:border-white/20 transition-all cursor-pointer"
+                  >
+                    {availablePeriods.map(p => (
+                      <option key={`start-${p}`} value={p} class="bg-[#0b0e14] text-white">
+                        {formatPeriod(p)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <span class="text-slate-500 self-end mb-2 font-medium text-xs">até</span>
+
+                <div class="flex flex-col">
+                  <span class="text-[9px] uppercase tracking-wider text-slate-400 font-bold mb-1">Mês Final</span>
+                  <select 
+                    id="select-end-period"
+                    value={endPeriod} 
+                    onChange={(e) => setEndPeriod(e.target.value)}
+                    class="bg-[#0b0e14] border border-white/10 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500 min-w-[130px] hover:border-white/20 transition-all cursor-pointer"
+                  >
+                    {availablePeriods.filter(p => p >= startPeriod).map(p => (
+                      <option key={`end-${p}`} value={p} class="bg-[#0b0e14] text-white">
+                        {formatPeriod(p)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5 bg-blue-500/5 border border-blue-500/20 px-3.5 py-2.5 rounded-xl w-full md:w-auto justify-between md:justify-start">
+              <span class="text-[11px] text-blue-300 font-mono">
+                Análise de despesas ativa: <strong class="text-white font-semibold">{formatPeriod(startPeriod)}</strong> a <strong class="text-white font-semibold">{formatPeriod(endPeriod)}</strong>
+              </span>
+              <span class="px-2.5 py-0.5 bg-blue-500/15 rounded-full text-[10px] text-blue-400 font-extrabold tracking-wide uppercase border border-blue-500/20">
+                {filteredGastosByPeriod.length} faturas encontradas
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Tab 1: Dashboard Home Layout */}
         {activeTab === "dashboard" && (

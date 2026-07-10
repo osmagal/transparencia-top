@@ -80,6 +80,261 @@ export const AUTORIDADES: Autoridade[] = [
     estado: "Federal",
     foto_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvAoxavL-Q0C2e6wMPOdXiE5i5T_rL7Dj4sLApkc9Usg&s=10",
     ativo: true
+  },
+  // Região Norte
+  {
+    id: "cameli-ac",
+    nome: "Gladson Cameli",
+    cargo: "Governador do Acre",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do AC",
+    estado: "AC",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Gladson_Cameli_%28foto_oficial%29.jpg",
+    ativo: true
+  },
+  {
+    id: "clecio-ap",
+    nome: "Clécio Luiz",
+    cargo: "Governador do Amapá",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do AP",
+    estado: "AP",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/e/ea/Cl%C3%A9cio_Lu%C3%ADz_oficial_cropped.jpg",
+    ativo: true
+  },
+  {
+    id: "lima-am",
+    nome: "Wilson Lima",
+    cargo: "Governador do Amazonas",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do AM",
+    estado: "AM",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/d/df/Wilson_Lima_-_2023.jpg",
+    ativo: true
+  },
+  {
+    id: "barbalho-pa",
+    nome: "Helder Barbalho",
+    cargo: "Governador do Pará",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do PA",
+    estado: "PA",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Helder_Barbalho_%28foto_oficial_2023%29.jpg",
+    ativo: true
+  },
+  {
+    id: "rocha-ro",
+    nome: "Coronel Marcos Rocha",
+    cargo: "Governador de Rondônia",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do RO",
+    estado: "RO",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/0/09/Coronel_Marcos_Rocha.jpg",
+    ativo: true
+  },
+  {
+    id: "denarium-rr",
+    nome: "Antonio Denarium",
+    cargo: "Governador de Roraima",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do RR",
+    estado: "RR",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Antonio_Denarium_em_2022.jpg",
+    ativo: true
+  },
+  {
+    id: "barbosa-to",
+    nome: "Wanderlei Barbosa",
+    cargo: "Governador de Tocantins",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do TO",
+    estado: "TO",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/8/87/Wanderlei_Barbosa_%28foto_oficial%29.jpg",
+    ativo: true
+  },
+  // Região Nordeste
+  {
+    id: "dantas-al",
+    nome: "Paulo Dantas",
+    cargo: "Governador de Alagoas",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo de AL",
+    estado: "AL",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Paulo_Dantas_%28cropped%29.jpg",
+    ativo: true
+  },
+  {
+    id: "rodrigues-ba",
+    nome: "Jerônimo Rodrigues",
+    cargo: "Governador da Bahia",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo da BA",
+    estado: "BA",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/2/23/Jer%C3%B4nimo_Rodrigues_%28foto_oficial%29.jpg",
+    ativo: true
+  },
+  {
+    id: "freitas-ce",
+    nome: "Elmano de Freitas",
+    cargo: "Governador do Ceará",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do CE",
+    estado: "CE",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/d/da/Elmano_de_Freitas_%28cropped%29.jpg",
+    ativo: true
+  },
+  {
+    id: "brandao-ma",
+    nome: "Carlos Brandão",
+    cargo: "Governador do Maranhão",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do MA",
+    estado: "MA",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Carlos_Brand%C3%A3o_%28foto_oficial%29.jpg",
+    ativo: true
+  },
+  {
+    id: "azevedo-pb",
+    nome: "João Azevêdo",
+    cargo: "Governador da Paraíba",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo da PB",
+    estado: "PB",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/7/7a/Jo%C3%A3o_Azev%C3%AAdo_em_2019.jpg",
+    ativo: true
+  },
+  {
+    id: "lyra-pe",
+    nome: "Raquel Lyra",
+    cargo: "Governadora de Pernambuco",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo de PE",
+    estado: "PE",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/2/23/Raquel_Lyra_%28cropped%29.jpg",
+    ativo: true
+  },
+  {
+    id: "fonteles-pi",
+    nome: "Rafael Fonteles",
+    cargo: "Governador do Piauí",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do PI",
+    estado: "PI",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Rafael_Fonteles_%28cropped%29.jpg",
+    ativo: true
+  },
+  {
+    id: "bezerra-rn",
+    nome: "Fátima Bezerra",
+    cargo: "Governadora do Rio Grande do Norte",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do RN",
+    estado: "RN",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/4/4c/F%C3%A1tima_Bezerra_%28cropped%29.jpg",
+    ativo: true
+  },
+  {
+    id: "mitidieri-se",
+    nome: "Fábio Mitidieri",
+    cargo: "Governador de Sergipe",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo de SE",
+    estado: "SE",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/4/43/F%C3%A1bio_Mitidieri_%28cropped%29.jpg",
+    ativo: true
+  },
+  // Região Centro-Oeste
+  {
+    id: "rocha-df",
+    nome: "Ibaneis Rocha",
+    cargo: "Governador do Distrito Federal",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do DF",
+    estado: "DF",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Ibaneis_Rocha_%28foto_oficial%29.jpg",
+    ativo: true
+  },
+  {
+    id: "caiado-go",
+    nome: "Ronaldo Caiado",
+    cargo: "Governador de Goiás",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo de GO",
+    estado: "GO",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Ronaldo_Caiado_%28cropped%29.jpg",
+    ativo: true
+  },
+  {
+    id: "mendes-mt",
+    nome: "Mauro Mendes",
+    cargo: "Governador de Mato Grosso",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do MT",
+    estado: "MT",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Mauro_Mendes_em_2019.jpg",
+    ativo: true
+  },
+  {
+    id: "riedel-ms",
+    nome: "Eduardo Riedel",
+    cargo: "Governador de Mato Grosso do Sul",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do MS",
+    estado: "MS",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/9/91/Eduardo_Riedel_%28cropped%29.jpg",
+    ativo: true
+  },
+  // Região Sudeste
+  {
+    id: "casagrande-es",
+    nome: "Renato Casagrande",
+    cargo: "Governador do Espírito Santo",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do ES",
+    estado: "ES",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Renato_Casagrande_em_2019.jpg",
+    ativo: true
+  },
+  {
+    id: "zema-mg",
+    nome: "Romeu Zema",
+    cargo: "Governador de Minas Gerais",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo de MG",
+    estado: "MG",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/3/36/Romeu_Zema_%28foto_oficial%29.jpg",
+    ativo: true
+  },
+  {
+    id: "castro-rj",
+    nome: "Cláudio Castro",
+    cargo: "Governador do Rio de Janeiro",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do RJ",
+    estado: "RJ",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/e/ea/Cl%C3%A1udio_Castro_%28cropped%29.jpg",
+    ativo: true
+  },
+  // Região Sul
+  {
+    id: "junior-pr",
+    nome: "Ratinho Junior",
+    cargo: "Governador do Paraná",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo do PR",
+    estado: "PR",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/7/75/Ratinho_Junior_%28foto_oficial%29.jpg",
+    ativo: true
+  },
+  {
+    id: "mello-sc",
+    nome: "Jorginho Mello",
+    cargo: "Governador de Santa Catarina",
+    poder: Poder.EXECUTIVO,
+    orgao_instituicao: "Governo de SC",
+    estado: "SC",
+    foto_url: "https://upload.wikimedia.org/wikipedia/commons/4/4b/Jorginho_Mello_em_2019.jpg",
+    ativo: true
   }
 ];
 
@@ -461,5 +716,281 @@ export const GASTOS: GastoUnificado[] = [
     documento_fiscal: "SP-93821",
     fornecedor_nome: "Hotel Unique São Paulo",
     fonte_dados: "portal_transparencia_stf"
+  },
+  // Gastos dos novos Governadores
+  {
+    id: "g34",
+    autoridade_id: "cameli-ac",
+    data_gasto: "2026-05-10",
+    valor: 48000.00,
+    categoria_unificada: "TRANSPORTE E VIAGENS",
+    descricao_original: "Locação de aeronave de pequeno porte para vistoria técnica de ramais rodoviários isolados",
+    documento_fiscal: "12.384.921/0001-99",
+    fornecedor_nome: "AeroTaxi Acreano Ltda",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g35",
+    autoridade_id: "clecio-ap",
+    data_gasto: "2026-05-18",
+    valor: 25000.00,
+    categoria_unificada: "MANUTENÇÃO E OPERAÇÃO",
+    descricao_original: "Manutenção extraordinária preventiva e corretiva em sistema de refrigeração escolar",
+    documento_fiscal: "88.391.029/0001-44",
+    fornecedor_nome: "Refrigeração Norte S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g36",
+    autoridade_id: "lima-am",
+    data_gasto: "2026-06-05",
+    valor: 125000.00,
+    categoria_unificada: "TRANSPORTE E VIAGENS",
+    descricao_original: "Adiantamento para compra de óleo diesel e combustível para embarcações de atendimento à saúde",
+    documento_fiscal: "09.391.203/0001-52",
+    fornecedor_nome: "Amazonas Distribuidora de Combustíveis S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g37",
+    autoridade_id: "barbalho-pa",
+    data_gasto: "2026-05-22",
+    valor: 145000.00,
+    categoria_unificada: "MANUTENÇÃO E OPERAÇÃO",
+    descricao_original: "Desenvolvimento técnico e suporte de plataforma para transparência e monitoramento ambiental",
+    documento_fiscal: "41.932.102/0001-88",
+    fornecedor_nome: "Sistemas Integrados Belém Ltda",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g38",
+    autoridade_id: "rocha-ro",
+    data_gasto: "2026-04-12",
+    valor: 38000.00,
+    categoria_unificada: "SEGURANÇA E LOGÍSTICA",
+    descricao_original: "Aquisição de transceptores digitais criptografados para escolta militar",
+    documento_fiscal: "02.391.821/0001-22",
+    fornecedor_nome: "Comunicações Rondônia S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g39",
+    autoridade_id: "denarium-rr",
+    data_gasto: "2026-05-26",
+    valor: 42000.00,
+    categoria_unificada: "ALIMENTAÇÃO",
+    descricao_original: "Fornecimento emergencial de refeições preparadas para rede de abrigos estaduais",
+    documento_fiscal: "11.239.028/0001-15",
+    fornecedor_nome: "Boa Vista Alimentos S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g40",
+    autoridade_id: "barbosa-to",
+    data_gasto: "2026-06-08",
+    valor: 31000.00,
+    categoria_unificada: "TRANSPORTE E VIAGENS",
+    descricao_original: "Locação de veículos utilitários tracionados para vistorias em obras rurais",
+    documento_fiscal: "22.391.029/0001-44",
+    fornecedor_nome: "Tocantins Rent a Car S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g41",
+    autoridade_id: "dantas-al",
+    data_gasto: "2026-05-15",
+    valor: 62000.00,
+    categoria_unificada: "MANUTENÇÃO E OPERAÇÃO",
+    descricao_original: "Desenvolvimento e customização do novo portal de serviços estaduais unificados",
+    documento_fiscal: "33.491.201/0001-10",
+    fornecedor_nome: "Alagoas Digital S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g42",
+    autoridade_id: "rodrigues-ba",
+    data_gasto: "2026-06-02",
+    valor: 195000.00,
+    categoria_unificada: "TRANSPORTE E VIAGENS",
+    descricao_original: "Locação emergencial de aeronave bimotor para atendimento logístico de comissões técnicas",
+    documento_fiscal: "55.201.391/0001-77",
+    fornecedor_nome: "Aero Salvador S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g43",
+    autoridade_id: "freitas-ce",
+    data_gasto: "2026-05-20",
+    valor: 115000.00,
+    categoria_unificada: "MANUTENÇÃO E OPERAÇÃO",
+    descricao_original: "Estudos de engenharia e modelagem hidráulica para bacias de irrigação regional",
+    documento_fiscal: "08.391.202/0001-99",
+    fornecedor_nome: "Ceará Recursos Hídricos Ltda",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g44",
+    autoridade_id: "brandao-ma",
+    data_gasto: "2026-06-11",
+    valor: 75000.00,
+    categoria_unificada: "SEGURANÇA E LOGÍSTICA",
+    descricao_original: "Implantação de monitoramento remoto eletrônico em postos avançados de assistência social",
+    documento_fiscal: "99.028.192/0001-44",
+    fornecedor_nome: "Maranhão Segurança Ltda",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g45",
+    autoridade_id: "azevedo-pb",
+    data_gasto: "2026-05-14",
+    valor: 53000.00,
+    categoria_unificada: "ALIMENTAÇÃO",
+    descricao_original: "Serviço de fornecimento contínuo de refeições preparadas para batalhões volantes de segurança",
+    documento_fiscal: "12.392.102/0001-33",
+    fornecedor_nome: "Sabor da Paraíba Ltda",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g46",
+    autoridade_id: "lyra-pe",
+    data_gasto: "2026-05-29",
+    valor: 138000.00,
+    categoria_unificada: "TRANSPORTE E VIAGENS",
+    descricao_original: "Emissão de passagens aéreas e taxas para comissão internacional de promoção industrial",
+    documento_fiscal: "77.102.391/0001-11",
+    fornecedor_nome: "Nordeste Linhas Executivas",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g47",
+    autoridade_id: "fonteles-pi",
+    data_gasto: "2026-06-04",
+    valor: 48000.00,
+    categoria_unificada: "MANUTENÇÃO E OPERAÇÃO",
+    descricao_original: "Serviço de migração e reestruturação da nuvem governamental corporativa da fazenda",
+    documento_fiscal: "03.203.948/0001-12",
+    fornecedor_nome: "Piauí Tech Solutions S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g48",
+    autoridade_id: "bezerra-rn",
+    data_gasto: "2026-05-25",
+    valor: 34000.00,
+    categoria_unificada: "HOSPEDAGEM",
+    descricao_original: "Hospedagem e diárias de equipes de auditoria fiscal e controle do estado",
+    documento_fiscal: "55.443.322/0001-10",
+    fornecedor_nome: "Natal Palace Hotel S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g49",
+    autoridade_id: "mitidieri-se",
+    data_gasto: "2026-06-15",
+    valor: 29000.00,
+    categoria_unificada: "MANUTENÇÃO E OPERAÇÃO",
+    descricao_original: "Contratação de licenças corporativas de segurança e criptografia de dados públicos",
+    documento_fiscal: "01.293.484/0001-20",
+    fornecedor_nome: "Sergipe Softwares Ltda",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g50",
+    autoridade_id: "rocha-df",
+    data_gasto: "2026-05-12",
+    valor: 165000.00,
+    categoria_unificada: "TRANSPORTE E VIAGENS",
+    descricao_original: "Locação de veículos executivos blindados para translado de representações consulares",
+    documento_fiscal: "02.391.821/0001-33",
+    fornecedor_nome: "Brasília Rent Cars S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g51",
+    autoridade_id: "caiado-go",
+    data_gasto: "2026-05-08",
+    valor: 110000.00,
+    categoria_unificada: "SEGURANÇA E LOGÍSTICA",
+    descricao_original: "Apoio logístico extraordinário integrado para ações de contingência ambiental no interior",
+    documento_fiscal: "88.391.029/0001-52",
+    fornecedor_nome: "Goiás Defesa & Segurança",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g52",
+    autoridade_id: "mendes-mt",
+    data_gasto: "2026-06-02",
+    valor: 142000.00,
+    categoria_unificada: "TRANSPORTE E VIAGENS",
+    descricao_original: "Fretamento de aeronave de asa rotativa para monitoramento florestal integrado do bioma",
+    documento_fiscal: "11.239.028/0001-44",
+    fornecedor_nome: "Pantanal Aero S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g53",
+    autoridade_id: "riedel-ms",
+    data_gasto: "2026-05-19",
+    valor: 78000.00,
+    categoria_unificada: "MANUTENÇÃO E OPERAÇÃO",
+    descricao_original: "Habilitação e suporte técnico de módulo regional de processamento eletrônico fazendário",
+    documento_fiscal: "92.831.029/0001-22",
+    fornecedor_nome: "Campo Grande Sistemas S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g54",
+    autoridade_id: "casagrande-es",
+    data_gasto: "2026-04-18",
+    valor: 54000.00,
+    categoria_unificada: "MANUTENÇÃO E OPERAÇÃO",
+    descricao_original: "Manutenção técnica estrutural em unidades hospitalares de alta complexidade",
+    documento_fiscal: "03.203.948/0001-99",
+    fornecedor_nome: "Vix Serviços Prediais Ltda",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g55",
+    autoridade_id: "zema-mg",
+    data_gasto: "2026-05-24",
+    valor: 182000.00,
+    categoria_unificada: "TRANSPORTE E VIAGENS",
+    descricao_original: "Fretamento aéreo intermunicipal para transporte de comitivas fazendárias e fiscais",
+    documento_fiscal: "45.678.901/0001-23",
+    fornecedor_nome: "Minas AeroTaxi S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g56",
+    autoridade_id: "castro-rj",
+    data_gasto: "2026-06-10",
+    valor: 195000.00,
+    categoria_unificada: "SEGURANÇA E LOGÍSTICA",
+    descricao_original: "Consultoria técnica qualificada em desenho de segurança corporativa preventiva",
+    documento_fiscal: "33.221.109/0001-88",
+    fornecedor_nome: "Rio Segurança Integrada S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g57",
+    autoridade_id: "junior-pr",
+    data_gasto: "2026-05-15",
+    valor: 128000.00,
+    categoria_unificada: "MANUTENÇÃO E OPERAÇÃO",
+    descricao_original: "Consultoria para expansão do sistema tributário e emissão unificada de faturas",
+    documento_fiscal: "98.765.432/0001-10",
+    fornecedor_nome: "Curitiba Software Integrado S/A",
+    fonte_dados: "portal_transparencia_fed"
+  },
+  {
+    id: "g58",
+    autoridade_id: "mello-sc",
+    data_gasto: "2026-06-12",
+    valor: 95000.00,
+    categoria_unificada: "TRANSPORTE E VIAGENS",
+    descricao_original: "Locação de frotas rodoviárias para equipes de infraestrutura e engenharia civil do estado",
+    documento_fiscal: "12.345.678/0001-90",
+    fornecedor_nome: "Santa Catarina Rent a Car S/A",
+    fonte_dados: "portal_transparencia_fed"
   }
 ];
