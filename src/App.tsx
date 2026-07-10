@@ -164,6 +164,17 @@ export default function App() {
   // Detailed selected authority for inspect overlay/drawer
   const [selectedAutoridadeId, setSelectedAutoridadeId] = useState<string | null>(null);
 
+  // Image loading errors tracker and proxy URL helper
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const getProxyUrl = (url: string) => {
+    if (!url) return "";
+    if (url.startsWith("https://upload.wikimedia.org/") || url.startsWith("https://encrypted-tbn0.gstatic.com/")) {
+      return `/api/proxy-image?url=${encodeURIComponent(url)}`;
+    }
+    return url;
+  };
+
   // Civic simulation states
   const [isExporting, setIsExporting] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
@@ -812,8 +823,14 @@ export default function App() {
                               <td class="p-4 flex items-center gap-3">
                                 <div class="relative">
                                   <div class="w-8 h-8 rounded-full bg-slate-800 border border-white/10 overflow-hidden flex items-center justify-center">
-                                    {aut.foto_url ? (
-                                      <img src={aut.foto_url} alt={aut.nome} class="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                    {aut.foto_url && !imageErrors[aut.id] ? (
+                                      <img 
+                                        src={getProxyUrl(aut.foto_url)} 
+                                        alt={aut.nome} 
+                                        class="w-full h-full object-cover" 
+                                        referrerPolicy="no-referrer" 
+                                        onError={() => setImageErrors(prev => ({ ...prev, [aut.id]: true }))}
+                                      />
                                     ) : (
                                       <User class="w-4 h-4 text-slate-400" />
                                     )}
@@ -1013,9 +1030,15 @@ export default function App() {
                 >
                   <div>
                     <div class="flex items-center justify-between mb-4">
-                      <div class="w-12 h-12 rounded-xl bg-slate-800 border border-white/10 overflow-hidden">
-                        {aut.foto_url ? (
-                          <img src={aut.foto_url} alt={aut.nome} class="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <div class="w-12 h-12 rounded-xl bg-slate-800 border border-white/10 overflow-hidden flex items-center justify-center">
+                        {aut.foto_url && !imageErrors[aut.id] ? (
+                          <img 
+                            src={getProxyUrl(aut.foto_url)} 
+                            alt={aut.nome} 
+                            class="w-full h-full object-cover" 
+                            referrerPolicy="no-referrer" 
+                            onError={() => setImageErrors(prev => ({ ...prev, [aut.id]: true }))}
+                          />
                         ) : (
                           <User class="w-6 h-6 text-slate-400" />
                         )}
@@ -1067,8 +1090,18 @@ export default function App() {
                 {filteredAutoridades[1] && (
                   <div class="glass-panel p-5 rounded-2xl flex flex-col items-center text-center order-2 sm:order-1 border-t-2 border-t-slate-400/30">
                     <span class="w-8 h-8 rounded-full bg-slate-400/20 text-slate-300 border border-slate-400/30 flex items-center justify-center text-xs font-bold mb-3">2</span>
-                    <div class="w-14 h-14 rounded-full bg-slate-800 overflow-hidden mb-3 border-2 border-slate-400">
-                      <img src={filteredAutoridades[1].foto_url} alt={filteredAutoridades[1].nome} class="w-full h-full object-cover" />
+                    <div class="w-14 h-14 rounded-full bg-slate-800 overflow-hidden mb-3 border-2 border-slate-400 flex items-center justify-center">
+                      {filteredAutoridades[1].foto_url && !imageErrors[filteredAutoridades[1].id] ? (
+                        <img 
+                          src={getProxyUrl(filteredAutoridades[1].foto_url)} 
+                          alt={filteredAutoridades[1].nome} 
+                          class="w-full h-full object-cover" 
+                          referrerPolicy="no-referrer"
+                          onError={() => setImageErrors(prev => ({ ...prev, [filteredAutoridades[1].id]: true }))}
+                        />
+                      ) : (
+                        <User class="w-6 h-6 text-slate-400" />
+                      )}
                     </div>
                     <h3 class="font-bold text-white text-xs">{filteredAutoridades[1].nome}</h3>
                     <p class="text-[10px] text-slate-400 truncate max-w-full">{filteredAutoridades[1].cargo}</p>
@@ -1082,8 +1115,18 @@ export default function App() {
                 {filteredAutoridades[0] && (
                   <div class="glass-panel p-6 rounded-2xl flex flex-col items-center text-center order-1 sm:order-2 border-t-4 border-t-blue-500 scale-105 shadow-xl shadow-blue-500/5">
                     <span class="w-9 h-9 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold mb-3 shadow-[0_0_15px_rgba(59,130,246,0.6)]">1</span>
-                    <div class="w-16 h-16 rounded-full bg-slate-800 overflow-hidden mb-3 border-2 border-blue-500">
-                      <img src={filteredAutoridades[0].foto_url} alt={filteredAutoridades[0].nome} class="w-full h-full object-cover" />
+                    <div class="w-16 h-16 rounded-full bg-slate-800 overflow-hidden mb-3 border-2 border-blue-500 flex items-center justify-center">
+                      {filteredAutoridades[0].foto_url && !imageErrors[filteredAutoridades[0].id] ? (
+                        <img 
+                          src={getProxyUrl(filteredAutoridades[0].foto_url)} 
+                          alt={filteredAutoridades[0].nome} 
+                          class="w-full h-full object-cover" 
+                          referrerPolicy="no-referrer"
+                          onError={() => setImageErrors(prev => ({ ...prev, [filteredAutoridades[0].id]: true }))}
+                        />
+                      ) : (
+                        <User class="w-8 h-8 text-slate-400" />
+                      )}
                     </div>
                     <h3 class="font-bold text-white text-sm">{filteredAutoridades[0].nome}</h3>
                     <p class="text-xs text-blue-400 truncate max-w-full font-medium">{filteredAutoridades[0].cargo}</p>
@@ -1097,8 +1140,18 @@ export default function App() {
                 {filteredAutoridades[2] && (
                   <div class="glass-panel p-5 rounded-2xl flex flex-col items-center text-center order-3 border-t-2 border-t-amber-700/30">
                     <span class="w-8 h-8 rounded-full bg-amber-700/20 text-amber-500 border border-amber-700/30 flex items-center justify-center text-xs font-bold mb-3">3</span>
-                    <div class="w-14 h-14 rounded-full bg-slate-800 overflow-hidden mb-3 border-2 border-amber-700">
-                      <img src={filteredAutoridades[2].foto_url} alt={filteredAutoridades[2].nome} class="w-full h-full object-cover" />
+                    <div class="w-14 h-14 rounded-full bg-slate-800 overflow-hidden mb-3 border-2 border-amber-700 flex items-center justify-center">
+                      {filteredAutoridades[2].foto_url && !imageErrors[filteredAutoridades[2].id] ? (
+                        <img 
+                          src={getProxyUrl(filteredAutoridades[2].foto_url)} 
+                          alt={filteredAutoridades[2].nome} 
+                          class="w-full h-full object-cover" 
+                          referrerPolicy="no-referrer"
+                          onError={() => setImageErrors(prev => ({ ...prev, [filteredAutoridades[2].id]: true }))}
+                        />
+                      ) : (
+                        <User class="w-6 h-6 text-slate-400" />
+                      )}
                     </div>
                     <h3 class="font-bold text-white text-xs">{filteredAutoridades[2].nome}</h3>
                     <p class="text-[10px] text-slate-400 truncate max-w-full">{filteredAutoridades[2].cargo}</p>
@@ -1748,8 +1801,18 @@ export default function App() {
               {/* Header profile of inspector drawer */}
               <div class="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
                 <div class="flex items-center gap-4">
-                  <div class="w-14 h-14 rounded-full border border-white/20 overflow-hidden bg-slate-800">
-                    <img src={selectedAutoridade.foto_url} alt={selectedAutoridade.nome} class="w-full h-full object-cover" />
+                  <div class="w-14 h-14 rounded-full border border-white/20 overflow-hidden bg-slate-800 flex items-center justify-center">
+                    {selectedAutoridade.foto_url && !imageErrors[selectedAutoridade.id] ? (
+                      <img 
+                        src={getProxyUrl(selectedAutoridade.foto_url)} 
+                        alt={selectedAutoridade.nome} 
+                        class="w-full h-full object-cover" 
+                        referrerPolicy="no-referrer"
+                        onError={() => setImageErrors(prev => ({ ...prev, [selectedAutoridade.id]: true }))}
+                      />
+                    ) : (
+                      <User class="w-6 h-6 text-slate-400" />
+                    )}
                   </div>
                   <div>
                     <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">{selectedAutoridade.cargo}</span>
