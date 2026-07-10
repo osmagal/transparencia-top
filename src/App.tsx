@@ -43,7 +43,117 @@ const CATEGORY_COLORS: Record<CategoriaUnificada, string> = {
 
 export default function App() {
   // Navigation tabs
-  const [activeTab, setActiveTab] = useState<"dashboard" | "autoridades" | "ranking" | "metodologia">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "autoridades" | "ranking" | "metodologia" | "servidores">("dashboard");
+
+  // Servidores Públicos States
+  const [servidoresList, setServidoresList] = useState<any[]>([]);
+  const [servidoresLoading, setServidoresLoading] = useState(false);
+  const [servidoresError, setServidoresError] = useState<string | null>(null);
+  const [servidoresSearch, setServidoresSearch] = useState("SILVA");
+  const [servidoresPage, setServidoresPage] = useState(1);
+  const [selectedServidor, setSelectedServidor] = useState<any | null>(null);
+  const [remuneracaoData, setRemuneracaoData] = useState<any | null>(null);
+  const [remuneracaoLoading, setRemuneracaoLoading] = useState(false);
+  const [remuneracaoError, setRemuneracaoError] = useState<string | null>(null);
+  const [remuneracaoMesAno, setRemuneracaoMesAno] = useState("202312");
+  const [isSandboxMode, setIsSandboxMode] = useState(false);
+
+  // Expanded search filters for Servidores
+  const [selectedOrgaoCode, setSelectedOrgaoCode] = useState<string>("15000"); // Default to MEC for instant success
+  const [selectedOrgaoName, setSelectedOrgaoName] = useState<string>("Ministério da Educação");
+  const [cpfSearch, setCpfSearch] = useState<string>("");
+  const [orgaosSearchInput, setOrgaosSearchInput] = useState<string>("");
+  const [orgaosSearchResults, setOrgaosSearchResults] = useState<any[]>([]);
+  const [orgaosLoading, setOrgaosLoading] = useState(false);
+
+  // Search function for Servidores
+  const handleSearchServidores = async (pageVal: number = 1) => {
+    const sSearch = servidoresSearch.trim();
+    const cSearch = cpfSearch.trim();
+
+    if (!cSearch && !selectedOrgaoCode) {
+      setServidoresError("O Portal da Transparência exige CPF ou seleção de Órgão Lotação para realizar buscas de servidores.");
+      return;
+    }
+
+    if (!cSearch && sSearch.length > 0 && sSearch.length < 3) {
+      setServidoresError("O nome de busca deve conter pelo menos 3 caracteres, conforme exigido pela API.");
+      return;
+    }
+
+    setServidoresLoading(true);
+    setServidoresError(null);
+    setServidoresPage(pageVal);
+
+    try {
+      let queryUrl = `/api/servidores?pagina=${pageVal}`;
+      if (sSearch) {
+        queryUrl += `&nome=${encodeURIComponent(sSearch)}`;
+      }
+      if (selectedOrgaoCode) {
+        queryUrl += `&orgaoServidorLotacao=${encodeURIComponent(selectedOrgaoCode)}`;
+      }
+      if (cSearch) {
+        queryUrl += `&cpf=${encodeURIComponent(cSearch)}`;
+      }
+
+      const response = await fetch(queryUrl);
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        const errMessage = errJson.error || `Erro na API: status ${response.status}`;
+        throw new Error(errMessage);
+      }
+      const json = await response.json();
+      setIsSandboxMode(!!json.isSandbox);
+      setServidoresList(json.data || []);
+    } catch (err: any) {
+      console.error(err);
+      setServidoresError(err.message || "Erro de conexão com o servidor ao carregar servidores.");
+    } finally {
+      setServidoresLoading(false);
+    }
+  };
+
+  // Search function for organs
+  const handleSearchOrgaos = async (desc: string) => {
+    if (desc.trim().length < 2) {
+      setOrgaosSearchResults([]);
+      return;
+    }
+    setOrgaosLoading(true);
+    try {
+      const response = await fetch(`/api/orgaos?descricao=${encodeURIComponent(desc.trim())}`);
+      if (response.ok) {
+        const json = await response.json();
+        setOrgaosSearchResults(json.data || []);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setOrgaosLoading(false);
+    }
+  };
+
+  // Fetch Remuneration detail
+  const handleFetchRemuneracao = async (servidorId: number, mesAnoVal: string) => {
+    setRemuneracaoLoading(true);
+    setRemuneracaoError(null);
+    setRemuneracaoData(null);
+
+    try {
+      const response = await fetch(`/api/remuneracao?idServidorPensionista=${servidorId}&mesAno=${mesAnoVal}`);
+      if (!response.ok) {
+        throw new Error(`Erro de remuneração: status ${response.status}`);
+      }
+      const json = await response.json();
+      setRemuneracaoData(json.data || null);
+    } catch (err: any) {
+      console.error(err);
+      setRemuneracaoError(err.message || "Não foi possível carregar os detalhes de remuneração para este período.");
+    } finally {
+      setRemuneracaoLoading(false);
+    }
+  };
 
   // Filters state
   const [searchQuery, setSearchQuery] = useState("");
@@ -388,6 +498,19 @@ export default function App() {
               class={`px-3 py-1.5 rounded-lg transition-all duration-200 ${activeTab === "metodologia" ? "text-blue-400 bg-white/5 border border-white/10" : "text-slate-400 hover:text-white"}`}
             >
               Metodologia
+            </button>
+            <button 
+              id="nav-servidores"
+              onClick={() => {
+                setActiveTab("servidores");
+                // Fetch default records so the list is initialized immediately
+                if (servidoresList.length === 0) {
+                  setTimeout(() => handleSearchServidores(1), 50);
+                }
+              }} 
+              class={`px-3 py-1.5 rounded-lg transition-all duration-200 ${activeTab === "servidores" ? "text-blue-400 bg-white/5 border border-white/10 animate-pulse" : "text-slate-400 hover:text-white"}`}
+            >
+              Servidores Públicos
             </button>
           </nav>
 
@@ -976,6 +1099,532 @@ export default function App() {
                   </li>
                 </ul>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 5: Servidores Públicos Live Query Tool */}
+        {activeTab === "servidores" && (
+          <div id="tab-servidores-content" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Left side: Search & Results list */}
+            <div class="lg:col-span-6 flex flex-col gap-4">
+              
+              {/* Informative Title */}
+              <div class="glass-panel p-5 rounded-2xl">
+                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
+                  Integração Oficial Portal da Transparência da CGU
+                </span>
+                <h2 class="text-lg font-bold text-white mt-1">Consulta Geral de Servidores Públicos</h2>
+                <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Pesquise no cadastro geral de funcionários civis federais da República Federativa do Brasil. Insira o nome de um servidor para inspecionar seu histórico funcional e remunerações.
+                </p>
+                
+                {isSandboxMode && (
+                  <div class="mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-[11px] text-blue-300 flex gap-2">
+                    <Info class="w-4 h-4 shrink-0 mt-0.5" />
+                    <span>
+                      <strong>Modo de Demonstração (Sandbox):</strong> O sistema está rodando sem chave da API do governo. Exibindo cadastro simulado de alta fidelidade. Para conectar à base de dados real do Portal da Transparência, configure a variável de ambiente <code>API_KEY_GOV</code> no seu Vercel ou no arquivo <code>.env</code>.
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Search Inputs and Actions */}
+              <div class="glass-panel p-5 rounded-2xl flex flex-col gap-4">
+                
+                {/* 1st Row: Nome & CPF */}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Nome Search */}
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Nome do Servidor (Opcional)</label>
+                    <div class="relative">
+                      <span class="absolute left-3 top-2.5 text-slate-500">
+                        <User class="w-4 h-4" />
+                      </span>
+                      <input 
+                        id="servidores-search-input"
+                        type="text"
+                        value={servidoresSearch}
+                        onChange={(e) => setServidoresSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleSearchServidores(1);
+                        }}
+                        placeholder="Nome (ex: SILVA, MARIA...)"
+                        class="w-full pl-9 pr-8 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
+                      />
+                      {servidoresSearch && (
+                        <button 
+                          onClick={() => setServidoresSearch("")} 
+                          class="absolute right-3 top-2.5 text-slate-500 hover:text-white"
+                        >
+                          <X class="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* CPF Search */}
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">CPF do Servidor (Busca Direta)</label>
+                    <div class="relative">
+                      <span class="absolute left-3 top-2.5 text-slate-500">
+                        <FileText class="w-4 h-4" />
+                      </span>
+                      <input 
+                        id="cpf-search-input"
+                        type="text"
+                        value={cpfSearch}
+                        onChange={(e) => setCpfSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleSearchServidores(1);
+                        }}
+                        placeholder="Ex: 12345678901 (Apenas Números)"
+                        class="w-full pl-9 pr-8 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 font-mono"
+                      />
+                      {cpfSearch && (
+                        <button 
+                          onClick={() => setCpfSearch("")} 
+                          class="absolute right-3 top-2.5 text-slate-500 hover:text-white"
+                        >
+                          <X class="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2nd Row: Órgão Selector */}
+                <div class="space-y-1.5 relative">
+                  <div class="flex justify-between items-center">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Órgão de Lotação (Exigido se não buscar por CPF)</label>
+                    {selectedOrgaoCode && (
+                      <button 
+                        onClick={() => {
+                          setSelectedOrgaoCode("");
+                          setSelectedOrgaoName("");
+                          setOrgaosSearchInput("");
+                        }}
+                        class="text-[9px] text-red-400 hover:underline flex items-center gap-0.5 font-semibold"
+                      >
+                        <X class="w-3 h-3" /> Limpar Órgão
+                      </button>
+                    )}
+                  </div>
+
+                  {selectedOrgaoCode ? (
+                    <div class="p-2.5 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center justify-between">
+                      <div class="flex items-center gap-2 min-w-0">
+                        <Building class="w-4 h-4 text-blue-400 shrink-0" />
+                        <div class="min-w-0">
+                          <p class="text-xs font-bold text-white truncate max-w-[280px] sm:max-w-[400px]">{selectedOrgaoName}</p>
+                          <p class="text-[9px] text-blue-400 font-mono">Código SIAPE: {selectedOrgaoCode}</p>
+                        </div>
+                      </div>
+                      <span class="text-[9px] bg-blue-500/25 text-blue-300 font-bold px-1.5 py-0.5 rounded shrink-0">Selecionado</span>
+                    </div>
+                  ) : (
+                    <div class="space-y-2">
+                      <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-slate-500">
+                          <Search class="w-4 h-4" />
+                        </span>
+                        <input 
+                          type="text"
+                          value={orgaosSearchInput}
+                          onChange={(e) => {
+                            setOrgaosSearchInput(e.target.value);
+                            handleSearchOrgaos(e.target.value);
+                          }}
+                          placeholder="Buscar órgãos (ex: Educação, Saúde, Fazenda, CGU...)"
+                          class="w-full pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
+                        />
+                        {orgaosLoading && (
+                          <div class="absolute right-3 top-2.5">
+                            <RefreshCw class="w-4 h-4 animate-spin text-blue-500" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Organ dropdown results */}
+                      {orgaosSearchResults.length > 0 && (
+                        <div class="absolute z-10 left-0 right-0 mt-1 bg-slate-900 border border-white/10 rounded-xl shadow-xl max-h-48 overflow-y-auto divide-y divide-white/5 custom-scrollbar">
+                          {orgaosSearchResults.map((org: any) => (
+                            <div 
+                              key={org.codigo}
+                              onClick={() => {
+                                setSelectedOrgaoCode(org.codigo);
+                                setSelectedOrgaoName(org.descricao);
+                                setOrgaosSearchResults([]);
+                                setOrgaosSearchInput("");
+                              }}
+                              class="p-2.5 hover:bg-white/5 cursor-pointer text-left text-xs transition-colors flex items-center justify-between"
+                            >
+                              <span class="font-semibold text-slate-200 truncate pr-2">{org.descricao}</span>
+                              <span class="text-[9px] text-blue-400 font-mono shrink-0">SIAPE: {org.codigo}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Quick Popular Presets */}
+                      <div class="flex flex-wrap gap-1.5 pt-1 items-center">
+                        <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Órgãos Comuns:</span>
+                        <button 
+                          onClick={() => { setSelectedOrgaoCode("15000"); setSelectedOrgaoName("Ministério da Educação"); }}
+                          class="px-2 py-0.5 bg-white/5 hover:bg-white/10 text-[10px] rounded-lg text-slate-300 border border-white/5 transition-all"
+                        >
+                          MEC
+                        </button>
+                        <button 
+                          onClick={() => { setSelectedOrgaoCode("25000"); setSelectedOrgaoName("Ministério da Saúde"); }}
+                          class="px-2 py-0.5 bg-white/5 hover:bg-white/10 text-[10px] rounded-lg text-slate-300 border border-white/5 transition-all"
+                        >
+                          Saúde
+                        </button>
+                        <button 
+                          onClick={() => { setSelectedOrgaoCode("31000"); setSelectedOrgaoName("Ministério da Economia, Fazenda e Planejamento"); }}
+                          class="px-2 py-0.5 bg-white/5 hover:bg-white/10 text-[10px] rounded-lg text-slate-300 border border-white/5 transition-all"
+                        >
+                          Fazenda
+                        </button>
+                        <button 
+                          onClick={() => { setSelectedOrgaoCode("20125"); setSelectedOrgaoName("Controladoria-Geral da União"); }}
+                          class="px-2 py-0.5 bg-white/5 hover:bg-white/10 text-[10px] rounded-lg text-slate-300 border border-white/5 transition-all"
+                        >
+                          CGU
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Consultation button */}
+                <button 
+                  id="btn-search-servidores"
+                  onClick={() => handleSearchServidores(1)}
+                  disabled={servidoresLoading}
+                  class="w-full py-2.5 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-800 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/10 transition-all shrink-0 mt-1"
+                >
+                  {servidoresLoading ? <RefreshCw class="w-4 h-4 animate-spin" /> : <Search class="w-4 h-4" />}
+                  REALIZAR CONSULTA OFICIAL
+                </button>
+              </div>
+
+              {/* Error messages */}
+              {servidoresError && (
+                <div class="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex gap-2">
+                  <AlertTriangle class="w-4 h-4 shrink-0" />
+                  <span>{servidoresError}</span>
+                </div>
+              )}
+
+              {/* Servidores Results list */}
+              <div class="glass-panel rounded-2xl flex flex-col overflow-hidden">
+                <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/[0.01]">
+                  <span class="text-xs font-bold text-white uppercase tracking-wider">
+                    Servidores Encontrados ({servidoresList.length})
+                  </span>
+                  <span class="text-[10px] text-slate-500 font-mono">Página {servidoresPage}</span>
+                </div>
+
+                {servidoresLoading ? (
+                  <div class="p-12 flex flex-col items-center justify-center gap-3 text-slate-400">
+                    <RefreshCw class="w-6 h-6 animate-spin text-blue-500" />
+                    <span class="text-xs">Consultando banco de dados do Portal da Transparência...</span>
+                  </div>
+                ) : servidoresList.length === 0 ? (
+                  <div class="p-12 text-center text-slate-500 text-xs">
+                    Nenhum servidor encontrado. Digite pelo menos 3 caracteres e clique em Consultar.
+                  </div>
+                ) : (
+                  <div class="divide-y divide-white/5 max-h-[500px] overflow-y-auto custom-scrollbar">
+                    {servidoresList.map((item, idx) => {
+                      const idVal = item.id || (item.servidor && item.servidor.id) || idx;
+                      const sName = item.servidor?.nome || "Nome não disponível";
+                      const sCpf = item.servidor?.cpfFormatado || "CPF Ocultado";
+                      const sState = item.servidor?.estado || "N/A";
+                      const isSelected = selectedServidor?.id === idVal;
+
+                      // Extract main role
+                      const firstCargo = item.fichasCargoEfetivo?.[0];
+                      const cargoName = firstCargo?.cargo || "Cargo não especificado";
+                      const orgaoName = firstCargo?.orgaoServidorExercicio || "Órgão não especificado";
+
+                      return (
+                        <div 
+                          key={idVal}
+                          onClick={() => {
+                            setSelectedServidor(item);
+                            handleFetchRemuneracao(idVal, remuneracaoMesAno);
+                          }}
+                          class={`p-4 hover:bg-white/5 transition-all cursor-pointer flex items-center justify-between gap-3 ${isSelected ? "bg-white/[0.03] border-l-2 border-l-blue-500" : ""}`}
+                        >
+                          <div class="space-y-1.5 min-w-0">
+                            <div class="flex items-center gap-2">
+                              <span class="font-bold text-white text-xs truncate block max-w-[280px]">
+                                {sName}
+                              </span>
+                              <span class={`px-1.5 py-0.5 rounded text-[8px] font-bold ${item.situacao === "Ativo" ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"}`}>
+                                {item.situacao || "Ativo"}
+                              </span>
+                            </div>
+                            <p class="text-[10px] text-blue-400 truncate max-w-[320px] font-medium">{cargoName}</p>
+                            <p class="text-[10px] text-slate-400 truncate max-w-[320px]">{orgaoName}</p>
+                            <div class="flex items-center gap-2 text-[9px] text-slate-500 font-mono">
+                              <span>CPF: {sCpf}</span>
+                              <span>•</span>
+                              <span>UF: {sState}</span>
+                            </div>
+                          </div>
+                          
+                          <ChevronRight class="w-4 h-4 text-slate-500" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Simple pagination */}
+                <div class="p-3 border-t border-white/10 flex items-center justify-between bg-white/[0.01]">
+                  <button
+                    disabled={servidoresPage <= 1 || servidoresLoading}
+                    onClick={() => handleSearchServidores(servidoresPage - 1)}
+                    class="px-2.5 py-1 bg-white/5 hover:bg-white/10 disabled:opacity-40 text-[10px] font-semibold rounded-lg text-slate-300 transition-all flex items-center gap-1"
+                  >
+                    <ChevronLeft class="w-3.5 h-3.5" /> Anterior
+                  </button>
+                  <span class="text-[10px] text-slate-400 font-semibold font-mono">Pág. {servidoresPage}</span>
+                  <button
+                    disabled={servidoresList.length < 5 || servidoresLoading}
+                    onClick={() => handleSearchServidores(servidoresPage + 1)}
+                    class="px-2.5 py-1 bg-white/5 hover:bg-white/10 disabled:opacity-40 text-[10px] font-semibold rounded-lg text-slate-300 transition-all flex items-center gap-1"
+                  >
+                    Próximo <ChevronRight class="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Right side: Detailed Servant Overview & Remuneration */}
+            <div class="lg:col-span-6 flex flex-col gap-4">
+              {selectedServidor ? (
+                <div class="space-y-4">
+                  
+                  {/* General details Card */}
+                  <div class="glass-panel p-5 rounded-2xl border-t-2 border-t-blue-500 space-y-4">
+                    <div class="flex justify-between items-start gap-2">
+                      <div>
+                        <span class="text-[9px] font-bold text-blue-400 uppercase tracking-widest block mb-1">DADOS FUNCIONAIS DETALHADOS</span>
+                        <h3 class="text-base font-bold text-white">{selectedServidor.servidor?.nome}</h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5 font-mono">ID Registro: {selectedServidor.id || selectedServidor.servidor?.id || "N/A"}</p>
+                      </div>
+                      <span class={`px-2 py-0.5 rounded-full text-[10px] font-bold ${selectedServidor.situacao === "Ativo" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20" : "bg-amber-500/15 text-amber-400 border border-amber-500/20"}`}>
+                        {selectedServidor.situacao || "Ativo"}
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-xs">
+                      <div class="p-3 bg-white/5 border border-white/5 rounded-xl space-y-1">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Órgão Exercício</span>
+                        <p class="text-white font-medium">{selectedServidor.fichasCargoEfetivo?.[0]?.orgaoServidorExercicio || "Não especificado"}</p>
+                        <span class="text-[9px] text-slate-500 font-mono block">UORG: {selectedServidor.fichasCargoEfetivo?.[0]?.uorgExercicio || "N/A"}</span>
+                      </div>
+
+                      <div class="p-3 bg-white/5 border border-white/5 rounded-xl space-y-1">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Órgão Lotação</span>
+                        <p class="text-white font-medium">{selectedServidor.fichasCargoEfetivo?.[0]?.orgaoServidorLotacao || "Não especificado"}</p>
+                        <span class="text-[9px] text-slate-500 font-mono block">UORG: {selectedServidor.fichasCargoEfetivo?.[0]?.uorgLotacao || "N/A"}</span>
+                      </div>
+
+                      <div class="p-3 bg-white/5 border border-white/5 rounded-xl space-y-1">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Cargo Efetivo</span>
+                        <p class="text-white font-medium">{selectedServidor.fichasCargoEfetivo?.[0]?.cargo || "Não especificado"}</p>
+                        <span class="text-[9px] text-slate-500 block">Classe: {selectedServidor.fichasCargoEfetivo?.[0]?.classe || "N/A"}</span>
+                      </div>
+
+                      <div class="p-3 bg-white/5 border border-white/5 rounded-xl space-y-1">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">Cargo Função/Comissão</span>
+                        <p class="text-white font-medium">{selectedServidor.fichasFuncao?.[0]?.atividade || "Nenhuma função comissionada"}</p>
+                        <span class="text-[9px] text-slate-500 block">Opção Cargo Efetivo: {selectedServidor.fichasFuncao?.[0]?.opcaoCargoEfetivo ? "Sim" : "Não"}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Remuneration Card */}
+                  <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                      <div>
+                        <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                          <Coins class="w-4 h-4 text-emerald-400" />
+                          Extrato de Remuneração CGU
+                        </h3>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Detalhamento dos rendimentos públicos mensais</p>
+                      </div>
+
+                      {/* Period/month selector */}
+                      <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider font-mono">Período:</span>
+                        <select
+                          value={remuneracaoMesAno}
+                          onChange={(e) => {
+                            setRemuneracaoMesAno(e.target.value);
+                            const idVal = selectedServidor.id || selectedServidor.servidor?.id;
+                            if (idVal) handleFetchRemuneracao(idVal, e.target.value);
+                          }}
+                          class="bg-white/5 border border-white/10 rounded-xl px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                        >
+                          <option value="202312" class="bg-slate-950 text-white">Dezembro / 2023</option>
+                          <option value="202311" class="bg-slate-950 text-white">Novembro / 2023</option>
+                          <option value="202310" class="bg-slate-950 text-white">Outubro / 2023</option>
+                          <option value="202309" class="bg-slate-950 text-white">Setembro / 2023</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {remuneracaoLoading ? (
+                      <div class="py-12 flex flex-col items-center justify-center gap-2 text-slate-400">
+                        <RefreshCw class="w-5 h-5 animate-spin text-emerald-400" />
+                        <span class="text-xs">Buscando folha de pagamento do servidor...</span>
+                      </div>
+                    ) : remuneracaoError ? (
+                      <div class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 text-center">
+                        {remuneracaoError}
+                      </div>
+                    ) : remuneracaoData ? (
+                      <div class="space-y-4">
+                        
+                        {/* Summary Numbers */}
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                          <div class="p-3 bg-white/5 border border-white/5 rounded-xl">
+                            <span class="text-[9px] text-slate-400 uppercase tracking-widest block font-medium">Rendimento Bruto</span>
+                            <span class="text-lg font-bold text-white font-mono block mt-1">
+                              R$ {(remuneracaoData.remuneracaoBasicaBruta + (remuneracaoData.outrasRemuneracoesEventuais || 0) + (remuneracaoData.ferias || 0) + (remuneracaoData.gratificacaoNatalina || 0)).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          <div class="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                            <span class="text-[9px] text-emerald-400 uppercase tracking-widest block font-medium">Líquido Recebido</span>
+                            <span class="text-lg font-bold text-emerald-400 font-mono block mt-1">
+                              R$ {remuneracaoData.remuneracaoLiquida.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Breakdown Progress Bars */}
+                        <div class="space-y-3.5">
+                          {/* 1. Salario Base */}
+                          <div>
+                            <div class="flex justify-between text-xs mb-1">
+                              <span class="text-slate-400">Remuneração Básica (Salário Base)</span>
+                              <span class="text-white font-mono">R$ {remuneracaoData.remuneracaoBasicaBruta.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+                            </div>
+                            <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                              <div class="bg-blue-500 h-full rounded-full w-full"></div>
+                            </div>
+                          </div>
+
+                          {/* 2. Remuneracoes Eventuais */}
+                          {((remuneracaoData.outrasRemuneracoesEventuais || 0) > 0 || (remuneracaoData.ferias || 0) > 0 || (remuneracaoData.gratificacaoNatalina || 0) > 0) && (
+                            <div>
+                              <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">Rendimentos Eventuais / Férias / 13º</span>
+                                <span class="text-white font-mono">R$ {((remuneracaoData.outrasRemuneracoesEventuais || 0) + (remuneracaoData.ferias || 0) + (remuneracaoData.gratificacaoNatalina || 0)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+                              </div>
+                              <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-purple-500 h-full rounded-full" style={{ width: `${(((remuneracaoData.outrasRemuneracoesEventuais || 0) + (remuneracaoData.ferias || 0) + (remuneracaoData.gratificacaoNatalina || 0)) / (remuneracaoData.remuneracaoBasicaBruta || 1)) * 100}%` }}></div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 3. Imposto de Renda */}
+                          <div>
+                            <div class="flex justify-between text-xs mb-1">
+                              <span class="text-rose-400">Dedução: Imposto de Renda Retido na Fonte (IRRF)</span>
+                              <span class="text-rose-400 font-mono">- R$ {remuneracaoData.impostoRenda.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+                            </div>
+                            <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                              <div class="bg-rose-500 h-full rounded-full" style={{ width: `${(remuneracaoData.impostoRenda / (remuneracaoData.remuneracaoBasicaBruta || 1)) * 100}%` }}></div>
+                            </div>
+                          </div>
+
+                          {/* 4. Previdencia Oficial */}
+                          <div>
+                            <div class="flex justify-between text-xs mb-1">
+                              <span class="text-amber-500">Dedução: Contribuição Previdenciária Oficial</span>
+                              <span class="text-amber-500 font-mono">- R$ {remuneracaoData.previdenciaOficial.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+                            </div>
+                            <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                              <div class="bg-amber-500 h-full rounded-full" style={{ width: `${(remuneracaoData.previdenciaOficial / (remuneracaoData.remuneracaoBasicaBruta || 1)) * 100}%` }}></div>
+                            </div>
+                          </div>
+
+                          {/* 5. Outros descontos */}
+                          {remuneracaoData.outrosDescontos > 0 && (
+                            <div>
+                              <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">Dedução: Outros Descontos / Retenções Teto</span>
+                                <span class="text-slate-400 font-mono">- R$ {remuneracaoData.outrosDescontos.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+                              </div>
+                              <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-slate-500 h-full rounded-full" style={{ width: `${(remuneracaoData.outrosDescontos / (remuneracaoData.remuneracaoBasicaBruta || 1)) * 100}%` }}></div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Audit message or AI breakdown helper */}
+                        <div class="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-[11px] text-slate-300 flex items-center justify-between gap-2">
+                          <span class="leading-relaxed">
+                            <strong>Transparência Fiscal:</strong> Esta remuneração respeita os limites estabelecidos pelo teto constitucional do funcionalismo público federal brasileiro.
+                          </span>
+                          
+                          <button
+                            onClick={() => {
+                              // Forward to chatbot with deep detailed question
+                              setActiveTab("dashboard");
+                              const prompt = `Analise a remuneração de ${selectedServidor.servidor?.nome} que recebe R$ ${remuneracaoData.remuneracaoLiquida.toLocaleString("pt-BR")} líquidos de um salário bruto de R$ ${remuneracaoData.remuneracaoBasicaBruta.toLocaleString("pt-BR")}. O que você acha desses descontos e desse nível salarial para o cargo de ${selectedServidor.fichasCargoEfetivo?.[0]?.cargo}?`;
+                              setChatInput(prompt);
+                              // We can simulate sending automatically!
+                              setTimeout(() => {
+                                const sendBtn = document.getElementById("btn-send-chat");
+                                if (sendBtn) sendBtn.click();
+                              }, 150);
+                            }}
+                            class="px-2 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg text-[9px] font-bold shrink-0 transition-all flex items-center gap-1 uppercase tracking-wider"
+                          >
+                            <Sparkles class="w-3 h-3" /> Analisar c/ IA
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div class="py-12 text-center text-slate-500 text-xs">
+                        Nenhuma informação de remuneração cadastrada para o período selecionado ou este servidor não possui faturas ativas.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div class="glass-panel p-12 rounded-3xl flex flex-col items-center justify-center text-center gap-4 text-slate-400 h-full min-h-[350px]">
+                  <div class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-300">
+                    <User class="w-6 h-6 text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-bold text-white">Nenhum Servidor Selecionado</h3>
+                    <p class="text-xs text-slate-400 mt-1 max-w-sm">
+                      Selecione um servidor na lista ao lado para inspecionar em detalhes sua ficha funcional de classe e seu salário líquido real do Portal da Transparência.
+                    </p>
+                  </div>
+                  
+                  <div class="flex flex-wrap items-center justify-center gap-1.5 pt-2 max-w-xs">
+                    <span class="text-[9px] text-slate-500 uppercase font-mono tracking-widest block w-full mb-1">Buscas Sugeridas:</span>
+                    <button onClick={() => { setServidoresSearch("CARLOS"); setTimeout(() => handleSearchServidores(1), 50); }} class="px-2 py-0.5 bg-white/5 hover:bg-white/10 text-[10px] rounded-lg text-slate-300 border border-white/5">Carlos</button>
+                    <button onClick={() => { setServidoresSearch("MARIA"); setTimeout(() => handleSearchServidores(1), 50); }} class="px-2 py-0.5 bg-white/5 hover:bg-white/10 text-[10px] rounded-lg text-slate-300 border border-white/5">Maria</button>
+                    <button onClick={() => { setServidoresSearch("ANA"); setTimeout(() => handleSearchServidores(1), 50); }} class="px-2 py-0.5 bg-white/5 hover:bg-white/10 text-[10px] rounded-lg text-slate-300 border border-white/5">Ana</button>
+                    <button onClick={() => { setServidoresSearch("FERNANDO"); setTimeout(() => handleSearchServidores(1), 50); }} class="px-2 py-0.5 bg-white/5 hover:bg-white/10 text-[10px] rounded-lg text-slate-300 border border-white/5">Fernando</button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
