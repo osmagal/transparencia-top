@@ -5,7 +5,7 @@ let aiClient: GoogleGenAI | null = null;
 
 function getAiClient(): GoogleGenAI {
   if (!aiClient) {
-    const rawApiKey = process.env.API_KEY_GOV || process.env.API_KEY_GEMINI || process.env.GEMINI_API_KEY || process.env.VITE_API_KEY_GOV;
+    const rawApiKey = process.env.GEMINI_API_KEY || process.env.API_KEY_GEMINI || process.env.VITE_GEMINI_API_KEY;
     const apiKey = rawApiKey?.trim();
     if (!apiKey || apiKey === "your_gemini_api_key_here" || apiKey === "your_gemini_api_key" || apiKey.includes("your") || apiKey.length < 15) {
       throw new Error("MISSING_API_KEY");
@@ -56,23 +56,23 @@ export default async function handler(req: any, res: any) {
       const isRanking = lower.includes("quem gastou mais") || lower.includes("maior gasto") || lower.includes("ranking") || lower.includes("mais gastou");
 
       if (isRanking) {
-        fallbackText = "Atualmente, no nosso painel de auditoria, a autoridade com o maior gasto acumulado é **Arthur Lira** (Presidente da Câmara dos Deputados), com um total consolidado de **R$ 1.142.450,22**.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
+        fallbackText = "Atualmente, no nosso painel de auditoria, a autoridade com o maior gasto acumulado é **Arthur Lira** (Presidente da Câmara dos Deputados), com um total consolidado de **R$ 1.142.450,22**.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **GEMINI_API_KEY** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
       } else if (isLula) {
-        fallbackText = "O Presidente **Luiz Inácio Lula da Silva** possui um gasto unificado acumulado de **R$ 984.120,00**. Seu maior gasto registrado foi com passagens e suporte internacional em viagens oficiais de Estado.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
+        fallbackText = "O Presidente **Luiz Inácio Lula da Silva** possui um gasto unificado acumulado de **R$ 984.120,00**. Seu maior gasto registrado foi com passagens e suporte internacional em viagens oficiais de Estado.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **GEMINI_API_KEY** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
       } else if (isLira) {
-        fallbackText = "O Deputado **Arthur Lira** acumula despesas de **R$ 1.142.450,22**. Seu principal lançamento é referente à locação de aeronaves privadas para apoio às comitivas parlamentares.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
+        fallbackText = "O Deputado **Arthur Lira** acumula despesas de **R$ 1.142.450,22**. Seu principal lançamento é referente à locação de aeronaves privadas para apoio às comitivas parlamentares.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **GEMINI_API_KEY** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
       } else if (isBarroso) {
-        fallbackText = "O Ministro **Luís Roberto Barroso** (Presidente do STF) acumula despesas de **R$ 380.000,00** focadas principalmente em deslocamentos internacionais e diárias de equipe técnica de apoio.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
+        fallbackText = "O Ministro **Luís Roberto Barroso** (Presidente do STF) acumula despesas de **R$ 380.000,00** focadas principalmente em deslocamentos internacionais e diárias de equipe técnica de apoio.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **GEMINI_API_KEY** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
       } else if (isViagem) {
-        fallbackText = "A categoria de **TRANSPORTE E VIAGENS** é disparada a mais onerosa do painel, acumulando mais de **R$ 1.667.125,65** em fretamentos de jatos, passagens e combustível.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
+        fallbackText = "A categoria de **TRANSPORTE E VIAGENS** é disparada a mais onerosa do painel, acumulando mais de **R$ 1.667.125,65** em fretamentos de jatos, passagens e combustível.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **GEMINI_API_KEY** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
       } else if (isSeguranca) {
-        fallbackText = "Despesas com **SEGURANÇA E LOGÍSTICA** somam mais de **R$ 220.000,00** no painel atual, englobando carros blindados de escolta, comunicação criptografada e suporte tático.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **API_KEY_GOV** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
+        fallbackText = "Despesas com **SEGURANÇA E LOGÍSTICA** somam mais de **R$ 220.000,00** no painel atual, englobando carros blindados de escolta, comunicação criptografada e suporte tático.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Adicione sua chave de API nas variáveis de ambiente em **GEMINI_API_KEY** ou **API_KEY_GEMINI** no Vercel para ativar o assistente de IA Gemini).*";
       } else {
-        fallbackText = `Olá! Entendi seu interesse em despesas federais e transparência pública. Atualmente monitoramos 8 autoridades de alto escalão com gastos unificados.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Para habilitar respostas cognitivas completas do modelo Gemini 3.5 Flash, configure a variável de ambiente **API_KEY_GOV** ou **API_KEY_GEMINI** com sua chave de API no Vercel ou no AI Studio).*`;
+        fallbackText = `Olá! Entendi seu interesse em despesas federais e transparência pública. Atualmente monitoramos 8 autoridades de alto escalão com gastos unificados.\n\n*(Nota: O chatbot está operando em Modo de Demonstração Local. Para habilitar respostas cognitivas completas do modelo Gemini 3.5 Flash, configure a variável de ambiente **GEMINI_API_KEY** ou **API_KEY_GEMINI** com sua chave de API no Vercel).*`;
       }
 
       if (isApiError) {
-        const activeKeyName = process.env.API_KEY_GOV ? 'API_KEY_GOV' : process.env.API_KEY_GEMINI ? 'API_KEY_GEMINI' : 'GEMINI_API_KEY';
+        const activeKeyName = process.env.GEMINI_API_KEY ? 'GEMINI_API_KEY' : 'API_KEY_GEMINI';
         fallbackText = `⚠️ **Nota de Conexão:** A chave de API fornecida (${activeKeyName}) retornou um erro na API do Gemini. Exibindo resposta baseada no motor local:\n\n${fallbackText}`;
       }
       return fallbackText;

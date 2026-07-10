@@ -136,9 +136,34 @@ export default async function handler(req: any, res: any) {
       ];
 
       // Filter by name if supplied
-      const filtered = queryName.length >= 3 
-        ? mockServidores.filter(s => s.servidor.nome.toLowerCase().includes(queryName))
-        : mockServidores;
+      let filtered = mockServidores;
+
+      if (queryName) {
+        filtered = filtered.filter(s => s.servidor.nome.toLowerCase().includes(queryName));
+      }
+
+      const lotacao = req.query.orgaoServidorLotacao as string;
+      if (lotacao) {
+        let organKeyword = "";
+        if (lotacao === "15000") organKeyword = "educação";
+        else if (lotacao === "31000" || lotacao === "17000") organKeyword = "fazenda";
+        else if (lotacao === "30000") organKeyword = "justiça";
+        else if (lotacao === "20125" || lotacao === "59000") organKeyword = "controladoria";
+
+        if (organKeyword) {
+          filtered = filtered.filter(s =>
+            s.fichasCargoEfetivo.some(f => f.orgaoServidorLotacao.toLowerCase().includes(organKeyword))
+          );
+        }
+      }
+
+      const cpfQuery = (req.query.cpf as string || "").trim();
+      if (cpfQuery) {
+        filtered = filtered.filter(s =>
+          s.servidor.cpfFormatado.includes(cpfQuery) ||
+          s.servidor.codigoFormatado.includes(cpfQuery)
+        );
+      }
 
       res.status(200).json({
         isSandbox: true,
@@ -154,6 +179,7 @@ export default async function handler(req: any, res: any) {
     if (req.query.pagina) params.append("pagina", req.query.pagina);
     if (req.query.orgaoServidorLotacao) params.append("orgaoServidorLotacao", req.query.orgaoServidorLotacao);
     if (req.query.orgaoServidorExercicio) params.append("orgaoServidorExercicio", req.query.orgaoServidorExercicio);
+    if (req.query.cpf) params.append("cpf", req.query.cpf);
 
     const targetUrl = `https://api.portaldatransparencia.gov.br/api-de-dados/servidores?${params.toString()}`;
 
