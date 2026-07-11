@@ -42,6 +42,31 @@ const CATEGORY_COLORS: Record<CategoriaUnificada, string> = {
   "OUTROS GASTOS CORPORATIVOS": "#94a3b8"
 };
 
+// Generate available months for remuneration from current year/month down to 2023
+const REMUNERATION_PERIODS = (() => {
+  const periods: { value: string; label: string }[] = [];
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  const monthNames = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+  ];
+
+  for (let y = currentYear; y >= 2023; y--) {
+    const startM = y === currentYear ? currentMonth : 12;
+    for (let m = startM; m >= 1; m--) {
+      const monthStr = m.toString().padStart(2, '0');
+      periods.push({
+        value: `${y}${monthStr}`,
+        label: `${monthNames[m - 1]} / ${y}`
+      });
+    }
+  }
+  return periods;
+})();
+
 export default function App() {
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<"dashboard" | "autoridades" | "ranking" | "metodologia" | "servidores">("dashboard");
@@ -56,7 +81,7 @@ export default function App() {
   const [remuneracaoData, setRemuneracaoData] = useState<any | null>(null);
   const [remuneracaoLoading, setRemuneracaoLoading] = useState(false);
   const [remuneracaoError, setRemuneracaoError] = useState<string | null>(null);
-  const [remuneracaoMesAno, setRemuneracaoMesAno] = useState("202312");
+  const [remuneracaoMesAno, setRemuneracaoMesAno] = useState(REMUNERATION_PERIODS[1]?.value || REMUNERATION_PERIODS[0]?.value || "202312");
   const [isSandboxMode, setIsSandboxMode] = useState(false);
 
   // Expanded search filters for Servidores
@@ -957,6 +982,8 @@ export default function App() {
                         <Tooltip 
                           formatter={(value: any) => `R$ ${parseFloat(value).toLocaleString("pt-BR")}`}
                           contentStyle={{ backgroundColor: "#090d16", borderColor: "rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }}
+                          itemStyle={{ color: "#fff" }}
+                          labelStyle={{ color: "#fff" }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
@@ -1236,6 +1263,8 @@ export default function App() {
                     <Tooltip 
                       formatter={(value: any) => `R$ ${parseFloat(value).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`}
                       contentStyle={{ backgroundColor: "#090d16", borderColor: "rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }}
+                      itemStyle={{ color: "#fff" }}
+                      labelStyle={{ color: "#fff" }}
                     />
                     <Bar dataKey="Gasto" radius={[4, 4, 0, 0]}>
                       {filteredAutoridades.map((aut, index) => (
@@ -1685,10 +1714,11 @@ export default function App() {
                           }}
                           className="bg-white/5 border border-white/10 rounded-xl px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
                         >
-                          <option value="202312" className="bg-slate-950 text-white">Dezembro / 2023</option>
-                          <option value="202311" className="bg-slate-950 text-white">Novembro / 2023</option>
-                          <option value="202310" className="bg-slate-950 text-white">Outubro / 2023</option>
-                          <option value="202309" className="bg-slate-950 text-white">Setembro / 2023</option>
+                          {REMUNERATION_PERIODS.map((period) => (
+                            <option key={period.value} value={period.value} className="bg-slate-950 text-white">
+                              {period.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
