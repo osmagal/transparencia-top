@@ -279,7 +279,19 @@ export default function App() {
   const [isTyping, setIsTyping] = useState(false);
 
   // States for manual custom expenditure simulation (to let the user interactively edit data!)
-  const [customGastos, setCustomGastos] = useState<GastoUnificado[]>(GASTOS);
+  const [customGastos, setCustomGastos] = useState<GastoUnificado[]>(() => {
+    // Distribute GASTOS over 2023, 2024, 2025, and 2026 to ensure there's always rich data
+    return GASTOS.map((g, idx) => {
+      const years = [2026, 2025, 2024, 2023];
+      const targetYear = years[idx % years.length];
+      const originalDate = g.data_gasto; // e.g. "2026-05-12"
+      const newDate = originalDate ? originalDate.replace("2026", targetYear.toString()) : "";
+      return {
+        ...g,
+        data_gasto: newDate
+      };
+    });
+  });
   const [showAddSpendingModal, setShowAddSpendingModal] = useState(false);
   const [newSpending, setNewSpending] = useState({
     autoridadeId: AUTORIDADES[0].id,
@@ -290,9 +302,9 @@ export default function App() {
     cnpj: ""
   });
 
-  // Period filter states (Initially covers the whole range of GASTOS from "2026-03" to "2026-06")
-  const [startPeriod, setStartPeriod] = useState<string>("2026-03");
-  const [endPeriod, setEndPeriod] = useState<string>("2026-06");
+  // Period filter states (Initially covers the wide range from Jan 2023 to Jul 2026)
+  const [startPeriod, setStartPeriod] = useState<string>("2023-01");
+  const [endPeriod, setEndPeriod] = useState<string>("2026-07");
 
   // Helper function to format "YYYY-MM" period strings to Portuguese format
   const formatPeriod = (yyyymm: string) => {
@@ -314,8 +326,17 @@ export default function App() {
         periods.add(g.data_gasto.substring(0, 7));
       }
     });
-    if (periods.size === 0) {
-      return ["2026-03", "2026-04", "2026-05", "2026-06"];
+    // Add custom dynamic range to allow full flexibility:
+    const currentDate = new Date();
+    const maxYear = currentDate.getFullYear(); // 2026
+    for (let y = 2023; y <= maxYear; y++) {
+      for (let m = 1; m <= 12; m++) {
+        // Only include up to current month for the current year
+        if (y === maxYear && m > (currentDate.getMonth() + 1)) {
+          break;
+        }
+        periods.add(`${y}-${m.toString().padStart(2, '0')}`);
+      }
     }
     return Array.from(periods).sort();
   }, [customGastos]);
