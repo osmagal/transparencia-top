@@ -16,10 +16,13 @@ export default async function handler(req: any, res: any) {
 
     const isMockOrMissing = !apiKey || apiKey === "your_gemini_api_key_here" || apiKey === "your_gemini_api_key" || apiKey.includes("your") || apiKey.length < 10;
 
-    const id = parseInt(req.query.idServidorPensionista || req.query.id || "0", 10);
+    let id = parseInt(req.query.idServidorAposentadoPensionista || req.query.idServidorPensionista || req.query.id || "0", 10);
+    if (isNaN(id)) {
+      id = 0;
+    }
     const mesAno = req.query.mesAno || "202312";
 
-    if (isMockOrMissing) {
+    if (isMockOrMissing || id === 0 || id === 10101 || id === 20202 || id === 30303 || id === 40404 || id === 50505 || id < 100000) {
       // Return high quality mock remuneration mapping to the specific servant ID
       let mockRemuneration: any = null;
 
@@ -143,36 +146,66 @@ export default async function handler(req: any, res: any) {
 
     // Call the official Portal da Transparência API for remuneration details
     const params = new URLSearchParams();
-    params.append("idServidorPensionista", id.toString());
+    params.append("idServidorAposentadoPensionista", id.toString());
     params.append("mesAno", mesAno);
     params.append("pagina", "1");
 
     const targetUrl = `https://api.portaldatransparencia.gov.br/api-de-dados/servidores/remuneracao?${params.toString()}`;
 
-    const response = await fetch(targetUrl, {
-      method: "GET",
-      headers: {
-        "chave-api-dados": apiKey,
-        "Accept": "application/json"
+    try {
+      const response = await fetch(targetUrl, {
+        method: "GET",
+        headers: {
+          "chave-api-dados": apiKey,
+          "Accept": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.warn(`Portal API Error (${response.status}): ${errText}. Falling back to graceful mock.`);
+        
+        const fallbackMock = {
+          id: id,
+          mesAno: mesAno,
+          remuneracaoBasicaBruta: 17200.00,
+          gratificacaoNatalina: 0.00,
+          ferias: 0.00,
+          outrasRemuneracoesEventuais: 850.00,
+          impostoRenda: 4100.00,
+          previdenciaOficial: 1890.00,
+          outrosDescontos: 310.00,
+          remuneracaoLiquida: 11750.00,
+          servidor: { nome: "SERVIDOR PORTAL DA TRANSPARÊNCIA", cpfFormatado: "***.***.***-**", situacao: "Ativo" }
+        };
+        res.status(200).json({ isSandbox: true, data: fallbackMock, warning: `API Error ${response.status}: fallback applied` });
+        return;
       }
-    });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      res.status(response.status).json({ error: `Portal API Error: ${errText}` });
-      return;
+      const data = await response.json();
+      const result = Array.isArray(data) ? data[0] : data;
+
+      res.status(200).json({
+        isSandbox: false,
+        data: result
+      });
+    } catch (fetchErr: any) {
+      console.warn("Fetch exception to Portal API, using fallback mock:", fetchErr);
+      const fallbackMock = {
+        id: id,
+        mesAno: mesAno,
+        remuneracaoBasicaBruta: 17200.00,
+        gratificacaoNatalina: 0.00,
+        ferias: 0.00,
+        outrasRemuneracoesEventuais: 850.00,
+        impostoRenda: 4100.00,
+        previdenciaOficial: 1890.00,
+        outrosDescontos: 310.00,
+        remuneracaoLiquida: 11750.00,
+        servidor: { nome: "SERVIDOR PORTAL DA TRANSPARÊNCIA", cpfFormatado: "***.***.***-**", situacao: "Ativo" }
+      };
+      res.status(200).json({ isSandbox: true, data: fallbackMock, warning: fetchErr.message });
     }
-
-    const data = await response.json();
-    
-    // In some cases, the Portal da Transparência API returns an array, in others a single object.
-    // Ensure we handle both and return the detailed object.
-    const result = Array.isArray(data) ? data[0] : data;
-
-    res.status(200).json({
-      isSandbox: false,
-      data: result
-    });
   } catch (error: any) {
     console.error("Error in remuneracao proxy:", error);
     res.status(500).json({ error: error.message });
